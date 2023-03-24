@@ -1,6 +1,6 @@
 import * as boom from "@hapi/boom";
 
-import { TravelRepository } from "../repositories/travel.repository";
+import { TravelRepository } from "../repositories/repository";
 
 export class TravelsService {
   constructor() {}

@@ -1,21 +1,20 @@
 import express, { NextFunction, Request, Response } from "express";
 
-import { TravelsService } from "../services/travel.service";
 import { validatorHandler } from "../middleware/validator.handler";
 import {
-  getTravelSchema,
-  createTravelSchema,
-  updateTravelSchema,
-} from "../schemas/travel.schema";
+  getCountrySchema,
+  createCountrySchema,
+  updateCountrySchema
+} from '../schemas/country.schema'
+import { CountriesService } from "../services/country.service";
 
 export const router = express.Router();
-const travelsService = new TravelsService();
+const countriesService = new CountriesService();
 
 router.get("/", async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const travels = await travelsService.find();
-    console.log('travels: ', travels)
-    res.json(travels);
+    const countries = await countriesService.find();
+    res.json(countries);
   } catch (error) {
     next(error);
   }
@@ -23,13 +22,13 @@ router.get("/", async (req: Request, res: Response, next: NextFunction) => {
 
 router.get(
   "/:id",
-  validatorHandler(getTravelSchema, "params"),
+  validatorHandler(getCountrySchema, "params"),
   async (req: Request, res: Response, next: NextFunction) => {
     const { id } = req.params;
 
     try {
-      const travel = await travelsService.findOne(id);
-      res.json(travel);
+      const country = await countriesService.findOne(id);
+      res.json(country);
     } catch (error) {
       next(error);
     }
@@ -38,14 +37,14 @@ router.get(
 
 router.post(
   "/",
-  validatorHandler(createTravelSchema, "body"),
+  validatorHandler(createCountrySchema, "body"),
   async (req: Request, res: Response, next: NextFunction) => {
     const body = req.body;
     try {
-      const travel = await travelsService.create(body);
+      const country = await countriesService.create(body);
       res.status(201).json({
         message: `Create`,
-        data: travel,
+        data: country,
       });
     } catch (error) {
       next(error);
@@ -55,17 +54,17 @@ router.post(
 
 router.put(
   "/:id",
-  validatorHandler(getTravelSchema, "params"),
-  validatorHandler(updateTravelSchema, "body"),
+  validatorHandler(getCountrySchema, "params"),
+  validatorHandler(updateCountrySchema, "body"),
   async (req: Request, res: Response, next: NextFunction) => {
     const body = req.body;
     const { id } = req.params;
 
     try {
-      const travel = await travelsService.update(id, body);
+      const country = await countriesService.update(id, body);
       res.json({
         message: `update`,
-        data: travel,
+        data: country,
       });
     } catch (error) {
       next(error);
@@ -77,9 +76,9 @@ router.delete("/:id", async (req: Request, res: Response, next: NextFunction) =>
   const { id } = req.params;
 
   try {
-    await travelsService.remove(id)
+    await countriesService.remove(id)
     res.json({
-      message: `travel #id ${id} delete`
+      message: `country #id ${id} delete`
     })
   } catch (error) {
     next(error)

@@ -1,17 +1,13 @@
-import {
-  Column,
-  PrimaryGeneratedColumn,
-  Entity
-} from "typeorm";
+import { Column, PrimaryGeneratedColumn, Entity } from "typeorm";
 
 @Entity()
 export class Hotel {
   @PrimaryGeneratedColumn()
-  id: string
+  id: string;
 
-  @Column({type: 'varchar', length: 50})
-  name: string
+  @Column({ type: "varchar", length: 50 })
+  name: string;
 
-  @Column({type: 'int'})
-  star: number
+  @Column({ type: "int" })
+  star: number;
 }

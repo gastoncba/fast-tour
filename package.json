@@ -7,12 +7,7 @@
     "dev": "tsc-watch --onSuccess \"nodemon dist/index.js\" ",
     "start": "node dist/index.js",
     "build": "tsc",
-    "lint": "eslint",
-    "typeorm": "typeorm-ts-node-commonjs -d src/database/database.ts",
-    "migrations:generate": "npm run typeorm migration:generate",
-    "migrations:run": "npm run typeorm -- migration:run",
-    "migrations:show": "npm run typeorm -- migration:show",
-    "migrations:drop": "npm run typeorm -- migration:drop"
+    "lint": "eslint"
   },
   "keywords": [],
   "author": "",

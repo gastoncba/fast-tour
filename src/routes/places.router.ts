@@ -1,21 +1,20 @@
 import express, { NextFunction, Request, Response } from "express";
 
-import { TravelsService } from "../services/travel.service";
 import { validatorHandler } from "../middleware/validator.handler";
 import {
-  getTravelSchema,
-  createTravelSchema,
-  updateTravelSchema,
-} from "../schemas/travel.schema";
+  createPlaceSchema,
+  getPlaceSchema,
+  updatePlaceSchema,
+} from "../schemas/place.schema";
+import { PlacesService } from "../services/place.service";
 
 export const router = express.Router();
-const travelsService = new TravelsService();
+const placesService = new PlacesService();
 
 router.get("/", async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const travels = await travelsService.find();
-    console.log('travels: ', travels)
-    res.json(travels);
+    const places = await placesService.find();
+    res.json(places);
   } catch (error) {
     next(error);
   }
@@ -23,13 +22,13 @@ router.get("/", async (req: Request, res: Response, next: NextFunction) => {
 
 router.get(
   "/:id",
-  validatorHandler(getTravelSchema, "params"),
+  validatorHandler(getPlaceSchema, "params"),
   async (req: Request, res: Response, next: NextFunction) => {
     const { id } = req.params;
 
     try {
-      const travel = await travelsService.findOne(id);
-      res.json(travel);
+      const place = await placesService.findOne(id);
+      res.json(place);
     } catch (error) {
       next(error);
     }
@@ -38,14 +37,14 @@ router.get(
 
 router.post(
   "/",
-  validatorHandler(createTravelSchema, "body"),
+  validatorHandler(createPlaceSchema, "body"),
   async (req: Request, res: Response, next: NextFunction) => {
     const body = req.body;
     try {
-      const travel = await travelsService.create(body);
+      const place = await placesService.create(body);
       res.status(201).json({
         message: `Create`,
-        data: travel,
+        data: place,
       });
     } catch (error) {
       next(error);
@@ -55,14 +54,14 @@ router.post(
 
 router.put(
   "/:id",
-  validatorHandler(getTravelSchema, "params"),
-  validatorHandler(updateTravelSchema, "body"),
+  validatorHandler(getPlaceSchema, "params"),
+  validatorHandler(updatePlaceSchema, "body"),
   async (req: Request, res: Response, next: NextFunction) => {
     const body = req.body;
     const { id } = req.params;
 
     try {
-      const travel = await travelsService.update(id, body);
+      const travel = await placesService.update(id, body);
       res.json({
         message: `update`,
         data: travel,
@@ -77,9 +76,9 @@ router.delete("/:id", async (req: Request, res: Response, next: NextFunction) =>
   const { id } = req.params;
 
   try {
-    await travelsService.remove(id)
+    await placesService.remove(id)
     res.json({
-      message: `travel #id ${id} delete`
+      message: `place #id ${id} delete`
     })
   } catch (error) {
     next(error)

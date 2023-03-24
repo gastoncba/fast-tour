@@ -3,9 +3,9 @@ import {
   PrimaryGeneratedColumn,
   Entity,
   OneToOne,
-  JoinColumn
+  JoinColumn,
 } from "typeorm";
-// import { BasicEntity } from "./basic.entity";
+
 import { Place } from "./place.entity";
 
 @Entity()
@@ -19,7 +19,7 @@ export class Travel {
   @Column({ type: "int" })
   price: number;
 
-  @OneToOne(() => Place, (place) => place.travel)
+  @OneToOne(() => Place, (place) => place.travel, { nullable: true })
   @JoinColumn()
-  place: Place
+  place: Place;
 }
