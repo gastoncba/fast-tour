@@ -1,7 +1,7 @@
 import Joi from "joi"
 
 const id = Joi.string().alphanum()
-const name = Joi.string().min(3).max(15)
+const name = Joi.string().min(3).max(50)
 
 export const createCountrySchema = Joi.object({
   name: name.required()

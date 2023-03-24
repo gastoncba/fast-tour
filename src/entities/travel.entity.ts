@@ -4,7 +4,9 @@ import {
   Entity,
   OneToOne,
   JoinColumn,
+  OneToMany
 } from "typeorm";
+import { Hotel } from "./hotel.entity";
 
 import { Place } from "./place.entity";
 
@@ -22,4 +24,7 @@ export class Travel {
   @OneToOne(() => Place, (place) => place.travel, { nullable: true })
   @JoinColumn()
   place: Place;
+
+  @OneToMany(() => Hotel, (hotel) => hotel.travel)
+  hotels: Hotel[]
 }

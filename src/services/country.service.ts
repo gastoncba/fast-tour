@@ -39,7 +39,7 @@ export class CountriesService {
     const country = await CountryRepository.findOneBy({id})
 
     if(!country) {
-      throw boom.notFound(`countyr #${id} not found`)
+      throw boom.notFound(`country #${id} not found`)
     }
 
     return await CountryRepository.delete(id)

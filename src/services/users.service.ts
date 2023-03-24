@@ -1,5 +1,3 @@
-import { Pool } from "pg";
-
 export class UsersService {
   constructor() {}
 

@@ -14,7 +14,6 @@ const travelsService = new TravelsService();
 router.get("/", async (req: Request, res: Response, next: NextFunction) => {
   try {
     const travels = await travelsService.find();
-    console.log('travels: ', travels)
     res.json(travels);
   } catch (error) {
     next(error);
@@ -40,7 +39,7 @@ router.post(
   "/",
   validatorHandler(createTravelSchema, "body"),
   async (req: Request, res: Response, next: NextFunction) => {
-    const body = req.body;
+    const { body } = req;
     try {
       const travel = await travelsService.create(body);
       res.status(201).json({

@@ -1,20 +1,20 @@
 import Joi from "joi";
 
 const id = Joi.number().integer()
-const name = Joi.string().min(3).max(15)
+const name = Joi.string().min(3).max(50)
 const description = Joi.string().min(3).max(50)
-const idCountry = Joi.number().integer()
+const countryId = Joi.number().integer()
 
 export const createPlaceSchema = Joi.object({
   name: name.required(),
   description: description.required(),
-  idCountry: idCountry.required()
+  countryId: countryId.required()
 })
 
 export const updatePlaceSchema = Joi.object({
   name: name,
   description: description,
-  idCountry: idCountry
+  idCountry: countryId
 })
 
 export const getPlaceSchema = Joi.object({
