@@ -1,86 +1,86 @@
-// import express, { NextFunction, Request, Response } from "express";
+import express, { NextFunction, Request, Response } from "express";
 
-// import { TravelsService } from "../services/travel.service";
-// import { validatorHandler } from "../middleware/validator.handler";
-// import {
-//   getTravelSchema,
-//   createTravelSchema,
-//   updateTravelSchema,
-// } from "../schemas/travel.schema";
+import { HotelService } from "../services/hotel.service";
+import { validatorHandler } from "../middleware/validator.handler";
+import {
+  getHotelSchema,
+  createHotelSchema,
+  updateHotelSchema,
+} from "../schemas/hotel.schema";
 
-// export const router = express.Router();
-// const travelsService = new TravelsService();
+export const router = express.Router();
+const hotelServices = new HotelService();
 
-// router.get("/", async (req: Request, res: Response, next: NextFunction) => {
-//   try {
-//     const travels = await travelsService.find();
-//     res.json(travels);
-//   } catch (error) {
-//     next(error);
-//   }
-// });
+router.get("/", async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const hotels = await hotelServices.find();
+    res.json(hotels);
+  } catch (error) {
+    next(error);
+  }
+});
 
-// router.get(
-//   "/:id",
-//   validatorHandler(getTravelSchema, "params"),
-//   async (req: Request, res: Response, next: NextFunction) => {
-//     const { id } = req.params;
+router.get(
+  "/:id",
+  validatorHandler(getHotelSchema, "params"),
+  async (req: Request, res: Response, next: NextFunction) => {
+    const { id } = req.params;
 
-//     try {
-//       const travel = await travelsService.findOne(id);
-//       res.json(travel);
-//     } catch (error) {
-//       next(error);
-//     }
-//   }
-// );
+    try {
+      const hotel = await hotelServices.findOne(id);
+      res.json(hotel);
+    } catch (error) {
+      next(error);
+    }
+  }
+);
 
-// router.post(
-//   "/",
-//   validatorHandler(createTravelSchema, "body"),
-//   async (req: Request, res: Response, next: NextFunction) => {
-//     const { body } = req;
-//     try {
-//       const travel = await travelsService.create(body);
-//       res.status(201).json({
-//         message: `Create`,
-//         data: travel,
-//       });
-//     } catch (error) {
-//       next(error);
-//     }
-//   }
-// );
+router.post(
+  "/",
+  validatorHandler(createHotelSchema, "body"),
+  async (req: Request, res: Response, next: NextFunction) => {
+    const { body } = req;
+    try {
+      const hotel = await hotelServices.create(body);
+      res.status(201).json({
+        message: `Create`,
+        data: hotel,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+);
 
-// router.put(
-//   "/:id",
-//   validatorHandler(getTravelSchema, "params"),
-//   validatorHandler(updateTravelSchema, "body"),
-//   async (req: Request, res: Response, next: NextFunction) => {
-//     const body = req.body;
-//     const { id } = req.params;
+router.put(
+  "/:id",
+  validatorHandler(getHotelSchema, "params"),
+  validatorHandler(updateHotelSchema, "body"),
+  async (req: Request, res: Response, next: NextFunction) => {
+    const body = req.body;
+    const { id } = req.params;
 
-//     try {
-//       const travel = await travelsService.update(id, body);
-//       res.json({
-//         message: `update`,
-//         data: travel,
-//       });
-//     } catch (error) {
-//       next(error);
-//     }
-//   }
-// );
+    try {
+      const hotel = await hotelServices.update(id, body);
+      res.json({
+        message: `update`,
+        data: hotel,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+);
 
-// router.delete("/:id", async (req: Request, res: Response, next: NextFunction) => {
-//   const { id } = req.params;
+router.delete("/:id", async (req: Request, res: Response, next: NextFunction) => {
+  const { id } = req.params;
 
-//   try {
-//     await travelsService.remove(id)
-//     res.json({
-//       message: `travel #id ${id} delete`
-//     })
-//   } catch (error) {
-//     next(error)
-//   }
-// });
+  try {
+    await hotelServices.remove(id)
+    res.json({
+      message: `hotel #id ${id} delete`
+    })
+  } catch (error) {
+    next(error)
+  }
+});

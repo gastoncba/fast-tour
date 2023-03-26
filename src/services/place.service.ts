@@ -9,12 +9,12 @@ export class PlacesService {
   constructor() {}
 
   async find() {
-    const place = PlaceRepository.find({relations: ['country']})
+    const place = PlaceRepository.find()
     return place;
   }
 
   async findOne(id: string) {
-    const place = await PlaceRepository.findOneBy({id})
+    const place = await PlaceRepository.findOne({ relations:['country'] , where: {id}})
     if(!place) {
       throw boom.notFound(`place #${id} not found`)
     }

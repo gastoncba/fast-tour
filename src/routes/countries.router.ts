@@ -4,16 +4,19 @@ import { validatorHandler } from "../middleware/validator.handler";
 import {
   getCountrySchema,
   createCountrySchema,
-  updateCountrySchema
+  updateCountrySchema,
+  queryCountrySchema
 } from '../schemas/country.schema'
 import { CountriesService } from "../services/country.service";
 
 export const router = express.Router();
 const countriesService = new CountriesService();
 
-router.get("/", async (req: Request, res: Response, next: NextFunction) => {
+router.get("/",
+  validatorHandler(queryCountrySchema, "query"),
+  async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const countries = await countriesService.find();
+    const countries = await countriesService.find(req.query);
     res.json(countries);
   } catch (error) {
     next(error);

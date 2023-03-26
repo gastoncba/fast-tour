@@ -1,6 +1,7 @@
 import * as boom from "@hapi/boom";
+import { In } from "typeorm";
 
-import { TravelRepository } from "../repositories/repository";
+import { HotelRepository, TravelRepository } from "../repositories/repository";
 import { PlacesService } from "./place.service";
 
 const placesServices = new PlacesService();
@@ -9,51 +10,75 @@ export class TravelsService {
   constructor() {}
 
   async find() {
-    const travel = await TravelRepository.find({ relations: ['place']})
-    return travel
+    const travel = await TravelRepository.find();
+    return travel;
   }
 
   async findOne(id: string) {
-    const travel = await TravelRepository.findOne({relations: ['relations'], where: { id }})
-    if(!travel) {
-      throw boom.notFound(`travel #${id} not found`)
+    const travel = await TravelRepository.findOne({
+      relations: ["place","hotels"],
+      where: { id },
+    });
+    if (!travel) {
+      throw boom.notFound(`travel #${id} not found`);
     }
-    return travel
+    return travel;
   }
 
-  async create(data: {name: string, price: number, placeId?: string}) {
-    const travel = TravelRepository.create(data)
+  async create(data: {
+    name: string;
+    price: number;
+    placeId: string;
+    hotelsIds: number[];
+  }) {
+    const travel = TravelRepository.create(data);
+    const destination = await placesServices.findOne(data.placeId);
+    const hotels = await HotelRepository.findBy({ id: In(data.hotelsIds) });
 
-    if(data.placeId) {
-      const place = await placesServices.findOne(data.placeId)
-      travel.place = place;
-    }
-    return await TravelRepository.save(travel)
+    travel.place = destination;
+    travel.hotels = hotels;
+
+    return await TravelRepository.save(travel);
   }
 
-  async update(id: string, changes: {name?: string, price?: number, placeId?: string}) {
-    const travel = await TravelRepository.findOneBy({id})
+  async update(
+    id: string,
+    changes: {
+      name?: string;
+      price?: number;
+      placeId?: string;
+      hotelsIds: number[];
+    }
+  ) {
+    const travel = await TravelRepository.findOneBy({id});
 
-    if(!travel) {
-      throw boom.notFound(`travel #${id} not found`)
+    if (!travel) {
+      throw boom.notFound(`travel #${id} not found`);
     }
 
-    if(changes.placeId) {
-      const place = await placesServices.findOne(changes.placeId);
-      travel.place = place;
+    if (changes.placeId) {
+      const destination = await placesServices.findOne(changes.placeId);
+      travel.place = destination;
     }
 
-    TravelRepository.merge(travel, changes)
-    return await TravelRepository.save(travel)
+    if (changes.hotelsIds) {
+      const hotels = await HotelRepository.findBy({
+        id: In(changes.hotelsIds),
+      });
+      travel.hotels = hotels;
+    }
+
+    TravelRepository.merge(travel, changes);
+    return await TravelRepository.save(travel);
   }
 
   async remove(id: string) {
-    const travel = await TravelRepository.findOneBy({id})
+    const travel = await TravelRepository.findOneBy({ id });
 
-    if(!travel) {
-      throw boom.notFound(`travel #${id} not found`)
+    if (!travel) {
+      throw boom.notFound(`travel #${id} not found`);
     }
 
-    return await TravelRepository.delete(id)
+    return await TravelRepository.delete(id);
   }
 }

@@ -2,8 +2,8 @@ import {
   Column,
   PrimaryGeneratedColumn,
   Entity,
-  OneToOne,
-  JoinColumn,
+  ManyToOne,
+  OneToMany
 } from "typeorm";
 
 import { Country } from "./country.entity";
@@ -17,10 +17,9 @@ export class Place {
   @Column({ type: "varchar", length: 255 })
   name: string;
 
-  @OneToOne(() => Travel, (travel) => travel.place, { nullable: true })
-  travel: Travel;
-
-  @OneToOne(() => Country, (country) => country.place, { nullable: true })
-  @JoinColumn()
+  @ManyToOne(() => Country, (country) => country.places)
   country: Country;
+
+  @OneToMany(() => Travel, (travel) => travel.place)
+  travels: Travel[]
 }

@@ -2,12 +2,11 @@ import {
   Column,
   PrimaryGeneratedColumn,
   Entity,
-  OneToOne,
-  JoinColumn,
-  OneToMany
+  ManyToMany,
+  JoinTable,
+  ManyToOne,
 } from "typeorm";
 import { Hotel } from "./hotel.entity";
-
 import { Place } from "./place.entity";
 
 @Entity()
@@ -21,10 +20,10 @@ export class Travel {
   @Column({ type: "int" })
   price: number;
 
-  @OneToOne(() => Place, (place) => place.travel, { nullable: true })
-  @JoinColumn()
-  place: Place;
+  @ManyToOne(() => Place, (place) => place.travels)
+  place: Place
 
-  @OneToMany(() => Hotel, (hotel) => hotel.travel)
+  @ManyToMany(() => Hotel, (hotel) => hotel.travels)
+  @JoinTable()
   hotels: Hotel[]
 }
