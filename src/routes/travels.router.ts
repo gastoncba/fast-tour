@@ -6,14 +6,17 @@ import {
   getTravelSchema,
   createTravelSchema,
   updateTravelSchema,
+  queryTravelSchema
 } from "../schemas/travel.schema";
 
 export const router = express.Router();
 const travelsService = new TravelsService();
 
-router.get("/", async (req: Request, res: Response, next: NextFunction) => {
+router.get("/",
+  validatorHandler(queryTravelSchema, "query"),
+  async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const travels = await travelsService.find();
+    const travels = await travelsService.find(req.query);
     res.json(travels);
   } catch (error) {
     next(error);

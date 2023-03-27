@@ -18,6 +18,6 @@ export const getCountrySchema = Joi.object({
 })
 
 export const queryCountrySchema = Joi.object({
-  take: take,
-  skip: skip
+  take,
+  skip
 })

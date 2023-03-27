@@ -20,6 +20,12 @@ export class Travel {
   @Column({ type: "int" })
   price: number;
 
+  @Column({type: 'date', nullable: true})
+  startDate: Date | null;
+
+  @Column({type: 'date', nullable: true})
+  endDate: Date | null;
+
   @ManyToOne(() => Place, (place) => place.travels)
   place: Place
 
