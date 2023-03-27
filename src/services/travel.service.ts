@@ -1,7 +1,13 @@
 import * as boom from "@hapi/boom";
 import moment from "moment";
 import QueryString from "qs";
-import { Between, FindManyOptions, In, LessThanOrEqual, MoreThanOrEqual } from "typeorm";
+import {
+  Between,
+  FindManyOptions,
+  In,
+  LessThanOrEqual,
+  MoreThanOrEqual,
+} from "typeorm";
 
 import { Travel } from "../entities";
 import { HotelRepository, TravelRepository } from "../repositories/repository";
@@ -30,24 +36,30 @@ export class TravelsService {
       };
     }
 
-    if(fromDate) {
+    if (fromDate) {
       const dateParts = (fromDate as string).split("/");
-      const newDate = new Date(parseInt(dateParts[2]), parseInt(dateParts[1]) - 1, parseInt(dateParts[0]));
+      const newDate = new Date(
+        parseInt(dateParts[2]),
+        parseInt(dateParts[1]) - 1,
+        parseInt(dateParts[0])
+      );
       options.where = {
         ...options.where,
-        startDate: MoreThanOrEqual(newDate)
-      }
+        startDate: MoreThanOrEqual(newDate),
+      };
     }
-    if(toDate) {
-      const dateParts = (toDate as string).split("/")
-      const newDate = new Date(parseInt(dateParts[2]), parseInt(dateParts[1]) - 1, parseInt(dateParts[0]));
+    if (toDate) {
+      const dateParts = (toDate as string).split("/");
+      const newDate = new Date(
+        parseInt(dateParts[2]),
+        parseInt(dateParts[1]) - 1,
+        parseInt(dateParts[0])
+      );
       options.where = {
         ...options.where,
-        endDate: LessThanOrEqual(newDate)
-      }
+        endDate: LessThanOrEqual(newDate),
+      };
     }
-
-    console.log('options: ', options)
 
     const travel = await TravelRepository.find(options);
     return travel;
@@ -72,8 +84,12 @@ export class TravelsService {
     placeId: string;
     hotelsIds: number[];
   }) {
-    const startDateFormater = moment(data.startDate, "DD/MM/YYYY").format("YYYY-MM-DD");
-    const endDateFormater = moment(data.endDate, "DD/MM/YYYY").format("YYYY-MM-DD");
+    const startDateFormater = moment(data.startDate, "DD/MM/YYYY").format(
+      "YYYY-MM-DD"
+    );
+    const endDateFormater = moment(data.endDate, "DD/MM/YYYY").format(
+      "YYYY-MM-DD"
+    );
     const travel = TravelRepository.create({
       ...data,
       startDate: startDateFormater,
@@ -118,13 +134,17 @@ export class TravelsService {
     }
 
     if (changes.startDate) {
-      const startDateFormater = moment(changes.startDate, "DD/MM/YYYY").format("YYYY-MM-DD");
+      const startDateFormater = moment(changes.startDate, "DD/MM/YYYY").format(
+        "YYYY-MM-DD"
+      );
       changes = { ...changes, startDate: startDateFormater };
-      console.log('fecha converitida: ', changes.startDate)
+      console.log("fecha converitida: ", changes.startDate);
     }
 
     if (changes.endDate) {
-      const endDateFormater = moment(changes.endDate, "DD/MM/YYYY").format("YYYY-MM-DD");
+      const endDateFormater = moment(changes.endDate, "DD/MM/YYYY").format(
+        "YYYY-MM-DD"
+      );
       changes = { ...changes, endDate: endDateFormater };
     }
 
