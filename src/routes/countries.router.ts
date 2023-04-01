@@ -47,8 +47,8 @@ router.get(
     const { id } = req.params;
 
     try {
-      const places = await countriesService.findPLaces(id);
-      res.json(places);
+      const country = await countriesService.findPLaces(id);
+      res.json(country);
     } catch (error) {
       next(error);
     }

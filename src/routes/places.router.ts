@@ -42,8 +42,8 @@ router.get(
     const { id } = req.params;
 
     try {
-      const travels = await placesService.findTravels(id);
-      res.json(travels);
+      const place = await placesService.findTravels(id);
+      res.json(place);
     } catch (error) {
       next(error);
     }

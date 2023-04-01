@@ -1,9 +1,7 @@
 import * as boom from "@hapi/boom";
-import { FindManyOptions } from "typeorm";
 
-import { PlaceRepository, TravelRepository } from "../repositories/repository";
+import { PlaceRepository } from "../repositories/repository";
 import { CountriesService } from "./country.service";
-import { Place } from "../entities";
 
 const countriesService = new CountriesService();
 
@@ -30,15 +28,14 @@ export class PlacesService {
   async findTravels(id: string) {
     const place = await PlaceRepository.findOne({
       where: { id },
-      relations: ["travels"],
+      relations: ["travels", "country"],
     });
 
     if (!place) {
       throw boom.notFound(`place #${id} not found`);
     }
 
-    const travels = place.travels;
-    return travels;
+    return place;
   }
 
   async create(data: {

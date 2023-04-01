@@ -40,8 +40,7 @@ export class CountriesService {
       throw boom.notFound(`country #${id} not found`);
     }
 
-    const places = country.places;
-    return places;
+    return country;
   }
 
   async create(data: { name: string }) {
