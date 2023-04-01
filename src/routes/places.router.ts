@@ -35,6 +35,21 @@ router.get(
   }
 );
 
+router.get(
+  "/:id/travels",
+  validatorHandler(getPlaceSchema, "params"),
+  async (req: Request, res: Response, next: NextFunction) => {
+    const { id } = req.params;
+
+    try {
+      const travels = await placesService.findTravels(id);
+      res.json(travels);
+    } catch (error) {
+      next(error);
+    }
+  }
+);
+
 router.post(
   "/",
   validatorHandler(createPlaceSchema, "body"),
@@ -72,15 +87,18 @@ router.put(
   }
 );
 
-router.delete("/:id", async (req: Request, res: Response, next: NextFunction) => {
-  const { id } = req.params;
+router.delete(
+  "/:id",
+  async (req: Request, res: Response, next: NextFunction) => {
+    const { id } = req.params;
 
-  try {
-    await placesService.remove(id)
-    res.json({
-      message: `place #id ${id} delete`
-    })
-  } catch (error) {
-    next(error)
+    try {
+      await placesService.remove(id);
+      res.json({
+        message: `place #id ${id} delete`,
+      });
+    } catch (error) {
+      next(error);
+    }
   }
-});
+);

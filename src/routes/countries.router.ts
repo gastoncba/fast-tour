@@ -5,23 +5,25 @@ import {
   getCountrySchema,
   createCountrySchema,
   updateCountrySchema,
-  queryCountrySchema
-} from '../schemas/country.schema'
+  queryCountrySchema,
+} from "../schemas/country.schema";
 import { CountriesService } from "../services/country.service";
 
 export const router = express.Router();
 const countriesService = new CountriesService();
 
-router.get("/",
+router.get(
+  "/",
   validatorHandler(queryCountrySchema, "query"),
   async (req: Request, res: Response, next: NextFunction) => {
-  try {
-    const countries = await countriesService.find(req.query);
-    res.json(countries);
-  } catch (error) {
-    next(error);
+    try {
+      const countries = await countriesService.find(req.query);
+      res.json(countries);
+    } catch (error) {
+      next(error);
+    }
   }
-});
+);
 
 router.get(
   "/:id",
@@ -32,6 +34,21 @@ router.get(
     try {
       const country = await countriesService.findOne(id);
       res.json(country);
+    } catch (error) {
+      next(error);
+    }
+  }
+);
+
+router.get(
+  "/:id/places",
+  validatorHandler(getCountrySchema, "params"),
+  async (req: Request, res: Response, next: NextFunction) => {
+    const { id } = req.params;
+
+    try {
+      const places = await countriesService.findPLaces(id);
+      res.json(places);
     } catch (error) {
       next(error);
     }
@@ -75,15 +92,18 @@ router.put(
   }
 );
 
-router.delete("/:id", async (req: Request, res: Response, next: NextFunction) => {
-  const { id } = req.params;
+router.delete(
+  "/:id",
+  async (req: Request, res: Response, next: NextFunction) => {
+    const { id } = req.params;
 
-  try {
-    await countriesService.remove(id)
-    res.json({
-      message: `country #id ${id} delete`
-    })
-  } catch (error) {
-    next(error)
+    try {
+      await countriesService.remove(id);
+      res.json({
+        message: `country #id ${id} delete`,
+      });
+    } catch (error) {
+      next(error);
+    }
   }
-});
+);

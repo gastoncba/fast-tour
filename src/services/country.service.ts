@@ -30,6 +30,20 @@ export class CountriesService {
     return country;
   }
 
+  async findPLaces(id: string) {
+    const country = await CountryRepository.findOne({
+      where: { id },
+      relations: ["places"],
+    });
+
+    if (!country) {
+      throw boom.notFound(`country #${id} not found`);
+    }
+
+    const places = country.places;
+    return places;
+  }
+
   async create(data: { name: string }) {
     const country = CountryRepository.create(data);
     return await CountryRepository.save(country);

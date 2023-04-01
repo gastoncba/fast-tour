@@ -1,7 +1,9 @@
 import * as boom from "@hapi/boom";
+import { FindManyOptions } from "typeorm";
 
-import { PlaceRepository } from "../repositories/repository"
+import { PlaceRepository, TravelRepository } from "../repositories/repository";
 import { CountriesService } from "./country.service";
+import { Place } from "../entities";
 
 const countriesService = new CountriesService();
 
@@ -9,52 +11,76 @@ export class PlacesService {
   constructor() {}
 
   async find() {
-    const place = PlaceRepository.find()
+    const place = PlaceRepository.find();
     return place;
   }
 
   async findOne(id: string) {
-    const place = await PlaceRepository.findOne({ relations:['country'] , where: {id}})
-    if(!place) {
-      throw boom.notFound(`place #${id} not found`)
+    const place = await PlaceRepository.findOne({
+      relations: ["country"],
+      where: { id },
+    });
+    if (!place) {
+      throw boom.notFound(`place #${id} not found`);
     }
 
     return place;
   }
 
-  async create(data: {name: string, description: string, countryId?: string}) {
-    const place = PlaceRepository.create(data)
+  async findTravels(id: string) {
+    const place = await PlaceRepository.findOne({
+      where: { id },
+      relations: ["travels"],
+    });
 
-    if(data.countryId) {
-      const country = await countriesService.findOne(data.countryId)
-      place.country = country;
+    if (!place) {
+      throw boom.notFound(`place #${id} not found`);
     }
-    return await PlaceRepository.save(place)
+
+    const travels = place.travels;
+    return travels;
   }
 
-  async update(id: string, changes: {name: string, description: string, countryId?: string}) {
-    const place = await PlaceRepository.findOneBy({id})
+  async create(data: {
+    name: string;
+    description: string;
+    countryId?: string;
+  }) {
+    const place = PlaceRepository.create(data);
 
-    if(!place) {
-      throw boom.notFound(`place #${id} not found`)
+    if (data.countryId) {
+      const country = await countriesService.findOne(data.countryId);
+      place.country = country;
+    }
+    return await PlaceRepository.save(place);
+  }
+
+  async update(
+    id: string,
+    changes: { name: string; description: string; countryId?: string }
+  ) {
+    const place = await PlaceRepository.findOneBy({ id });
+
+    if (!place) {
+      throw boom.notFound(`place #${id} not found`);
     }
 
-    if(changes.countryId) {
-      const country = await countriesService.findOne(changes.countryId)
-      place.country = country
+    if (changes.countryId) {
+      const country = await countriesService.findOne(changes.countryId);
+      place.country = country;
     }
 
-    PlaceRepository.merge(place, changes)
-    return await PlaceRepository.save(place)
+    PlaceRepository.merge(place, changes);
+    return await PlaceRepository.save(place);
   }
 
   async remove(id: string) {
-    const place = await PlaceRepository.findOneBy({id})
+    const place = await PlaceRepository.findOneBy({ id });
 
-    if(!place) {
-      throw boom.notFound(`place #${id} not found`)
+    if (!place) {
+      throw boom.notFound(`place #${id} not found`);
     }
 
-    return await PlaceRepository.delete(id)
+    return await PlaceRepository.delete(id);
   }
 }

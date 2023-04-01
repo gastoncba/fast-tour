@@ -12,7 +12,7 @@ const placeId = Joi.number().integer()
 const hotelsIds = Joi.array().items(Joi.number().positive())
 
 const max_price = Joi.number().integer().positive()
-const min_price = Joi.number().integer().positive()
+const min_price = Joi.number().integer().positive().min(0)
 const take = Joi.number().integer().positive()
 const skip = Joi.number().integer().positive()
 const fromDate = Joi.extend(JoiDate).date().format("DD/MM/YYYY")
