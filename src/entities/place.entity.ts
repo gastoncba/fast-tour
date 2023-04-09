@@ -17,6 +17,9 @@ export class Place {
   @Column({ type: "varchar", length: 255 })
   name: string;
 
+  @Column({type: 'varchar', length: 255})
+  img: string;
+
   @ManyToOne(() => Country, (country) => country.places)
   country: Country;
 

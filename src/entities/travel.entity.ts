@@ -20,11 +20,14 @@ export class Travel {
   @Column({ type: "int" })
   price: number;
 
-  @Column({type: 'date', nullable: true})
-  startDate: Date | null;
+  @Column({type: 'date'})
+  startDate: Date;
 
-  @Column({type: 'date', nullable: true})
-  endDate: Date | null;
+  @Column({type: 'date'})
+  endDate: Date;
+
+  @Column({type: 'varchar', length: 255})
+  img: string;
 
   @ManyToOne(() => Place, (place) => place.travels)
   place: Place

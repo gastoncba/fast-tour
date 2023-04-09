@@ -9,8 +9,8 @@ import {
   MoreThanOrEqual,
 } from "typeorm";
 
-import { Travel } from "../entities";
-import { HotelRepository, TravelRepository } from "../repositories/repository";
+import { Place, Travel } from "../entities";
+import { HotelRepository, PlaceRepository, TravelRepository } from "../repositories/repository";
 import { PlacesService } from "./place.service";
 
 const placesServices = new PlacesService();
@@ -19,7 +19,7 @@ export class TravelsService {
   constructor() {}
 
   async find(query: QueryString.ParsedQs) {
-    const { take, skip, max_price, min_price, fromDate, toDate } = query;
+    const { take, skip, max_price, min_price, fromDate, toDate, placeId} = query;
     const options: FindManyOptions<Travel> = {};
     if (take && skip) {
       options.take = parseInt(take as string);
@@ -59,6 +59,17 @@ export class TravelsService {
         ...options.where,
         endDate: LessThanOrEqual(newDate),
       };
+    }
+
+    if(placeId) {
+      const id = placeId as string
+      const place = await PlaceRepository.findOne({where: {id}})
+      if(place) {
+        options.where = {
+          ...options.where,
+          place: place
+        }
+      }
     }
 
     const travel = await TravelRepository.find(options);

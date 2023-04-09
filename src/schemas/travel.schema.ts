@@ -3,6 +3,7 @@ import JoiDate from "@joi/date";
 
 const id = Joi.number().integer()
 const name = Joi.string().min(3).max(50)
+const img = Joi.string()
 
 const startDate = Joi.extend(JoiDate).date().format("DD/MM/YYYY")
 const endDate = Joi.extend(JoiDate).date().format("DD/MM/YYYY")
@@ -23,6 +24,7 @@ export const createTravelSchema = Joi.object({
   price: price.required(),
   startDate: startDate.required(),
   endDate: endDate.required(),
+  img: img.required(),
   placeId: placeId.required(),
   hotelsIds: hotelsIds.required()
 })
@@ -32,6 +34,7 @@ export const updateTravelSchema = Joi.object({
   price: price,
   startDate: startDate,
   endDate: endDate,
+  img: img,
   placeId: placeId,
   hotelsIds: hotelsIds
 })
@@ -49,5 +52,6 @@ export const queryTravelSchema = Joi.object({
     then: Joi.required()
   }),
   fromDate,
-  toDate
+  toDate,
+  placeId
 })

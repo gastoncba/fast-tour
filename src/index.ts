@@ -18,7 +18,7 @@ app.use(express.json())
 app.use(cors())
 
 app.get('/', (req:Request, res: Response) => {
-  res.send('Hola mi server express');
+  res.send('API REST Fast Tour');
 });
 
 routerApi(app)

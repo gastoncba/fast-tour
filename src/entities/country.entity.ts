@@ -11,6 +11,9 @@ export class Country {
   @Column({ type: "varchar", length: 255 })
   name: string;
 
+  @Column({type: 'varchar', length: 255})
+  img: string;
+
   @OneToMany(() => Place, (place) => place.country)
   places: Place[];
 
