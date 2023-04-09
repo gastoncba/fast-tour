@@ -26,7 +26,7 @@ export class Travel {
   @Column({type: 'date'})
   endDate: Date;
 
-  @Column({type: 'varchar', length: 255})
+  @Column({type: 'varchar', length: 255, nullable: true})
   img: string;
 
   @ManyToOne(() => Place, (place) => place.travels)
