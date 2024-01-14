@@ -1,6 +1,7 @@
 import { DataSource } from "typeorm";
 import { config } from "../config/config";
-import { Country, Hotel, Place, Travel } from "../entities";
+
+import { Country, Hotel, Place, Trip } from "../entities";
 
 export const appDataSource = new DataSource({
     type: "postgres",
@@ -11,8 +12,5 @@ export const appDataSource = new DataSource({
     database: config.dbName,
     synchronize: true,
     logging: true,
-    entities: [Travel, Country, Place, Hotel],
-    migrations: [],
-    subscribers: []
-    // migrations: ['src/database/migrations/*.ts']
+    entities: [Trip, Country, Place, Hotel],
 })

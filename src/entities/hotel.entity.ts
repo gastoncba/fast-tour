@@ -1,5 +1,6 @@
-import { Column, PrimaryGeneratedColumn, Entity, ManyToMany} from "typeorm";
-import { Travel } from "./travel.entity";
+import { Column, PrimaryGeneratedColumn, Entity, ManyToOne } from "typeorm";
+
+import { Place } from "./place.entity";
 
 @Entity()
 export class Hotel {
@@ -9,9 +10,15 @@ export class Hotel {
   @Column({ type: "varchar", length: 50 })
   name: string;
 
-  @Column({ type: "int" })
-  star: number;
+  @Column({ type: "varchar", length: 50 , nullable: true })
+  description: string;
 
-  @ManyToMany(() => Travel, (travel) => travel.hotels)
-  travels: Travel[];
+  @Column({ type: "int" })
+  stars: number;
+
+  @Column({ type: "varchar", length: 255, nullable: true })
+  img: string;
+
+  @ManyToOne(() => Place, (place) => place.hotels)
+  place: Place;
 }

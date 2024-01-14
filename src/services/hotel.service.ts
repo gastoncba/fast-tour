@@ -1,6 +1,9 @@
 import * as boom from "@hapi/boom";
 
 import { HotelRepository } from "../repositories/repository";
+import { PlaceService } from "./place.service";
+
+const placeService = new PlaceService();
 
 export class HotelService {
   constructor() {}
@@ -18,16 +21,25 @@ export class HotelService {
     return hotel;
   }
 
-  async create(data: { name: string; star: number; }) {
-    const hotel = HotelRepository.create(data);
+  async create(data: { name: string; stars: number; placeId: string; description?: string }) {
+    const { placeId, ...newHotel } = data;
+    const hotel = HotelRepository.create(newHotel);
+    const place = await placeService.findOne(placeId);
+    hotel.place = place;
+
     return await HotelRepository.save(hotel);
   }
 
-  async update(id: string, changes: { name?: string; star?: number }) {
+  async update(id: string, changes: { name?: string; stars?: number; description?: string; placeId?: string }) {
     const hotel = await HotelRepository.findOneBy({ id });
 
     if (!hotel) {
       throw boom.notFound(`hotel #${id} not found`);
+    }
+
+    if (changes.placeId) {
+      const place = await placeService.findOne(changes.placeId);
+      hotel.place = place;
     }
 
     HotelRepository.merge(hotel, changes);

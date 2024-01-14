@@ -1,6 +1,6 @@
-import * as dotenv from 'dotenv'
+import * as dotenv from "dotenv";
 
-dotenv.config()
+dotenv.config();
 
 export const config = {
   env: process.env.NODE_ENV || "dev",
@@ -11,5 +11,5 @@ export const config = {
   dbHost: process.env.DB_HOST,
   dbName: process.env.DB_NAME,
   //@ts-ignore
-  dbPort: parseInt(process.env.DB_PORT,10)
+  dbPort: parseInt(process.env.DB_PORT, 10),
 };

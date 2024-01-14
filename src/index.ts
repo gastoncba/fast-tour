@@ -7,9 +7,14 @@ import { logError, errorHandler, boomErrorHandler} from './middleware/error.hand
 import { appDataSource } from "./database/database";
 import { config } from "./config/config";
 
-appDataSource.initialize()
-  .then(() => console.log("Conexion exitosa"))
-  .catch((err) => console.log("Error de conexion ", err))
+(async () => {
+  try {
+    await appDataSource.initialize();
+    console.log("Conexión exitosa!");
+  } catch (error) {
+    console.log("Error en la conexión:", error);
+  }
+})();
 
 const app = express();
 const port = config.port;
@@ -22,7 +27,6 @@ app.get('/', (req:Request, res: Response) => {
 });
 
 routerApi(app)
-
 app.use(logError)
 app.use(boomErrorHandler)
 app.use(errorHandler)

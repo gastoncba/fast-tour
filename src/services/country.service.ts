@@ -5,7 +5,7 @@ import { FindManyOptions } from "typeorm";
 import { Country } from "../entities";
 import { CountryRepository } from "../repositories/repository";
 
-export class CountriesService {
+export class CountryService {
   constructor() {}
 
   async find(query: QueryString.ParsedQs) {
@@ -30,25 +30,12 @@ export class CountriesService {
     return country;
   }
 
-  async findPLaces(id: string) {
-    const country = await CountryRepository.findOne({
-      where: { id },
-      relations: ["places"],
-    });
-
-    if (!country) {
-      throw boom.notFound(`country #${id} not found`);
-    }
-
-    return country;
-  }
-
-  async create(data: { name: string }) {
+  async create(data: { name: string, code: string }) {
     const country = CountryRepository.create(data);
     return await CountryRepository.save(country);
   }
 
-  async update(id: string, changes: { name: string }) {
+  async update(id: string, changes: { name?: string, code?: string }) {
     const country = await CountryRepository.findOneBy({ id });
 
     if (!country) {

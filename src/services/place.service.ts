@@ -1,23 +1,21 @@
 import * as boom from "@hapi/boom";
+import { In } from "typeorm";
 
 import { PlaceRepository } from "../repositories/repository";
-import { CountriesService } from "./country.service";
+import { CountryService } from "./country.service";
 
-const countriesService = new CountriesService();
+const countryService = new CountryService();
 
-export class PlacesService {
+export class PlaceService {
   constructor() {}
 
   async find() {
-    const place = PlaceRepository.find();
+    const place = await PlaceRepository.find();
     return place;
   }
 
   async findOne(id: string) {
-    const place = await PlaceRepository.findOne({
-      relations: ["country"],
-      where: { id },
-    });
+    const place = await PlaceRepository.findOne({ relations: ["country"], where: { id } });
     if (!place) {
       throw boom.notFound(`place #${id} not found`);
     }
@@ -25,37 +23,25 @@ export class PlacesService {
     return place;
   }
 
-  async findTravels(id: string) {
-    const place = await PlaceRepository.findOne({
-      where: { id },
-      relations: ["travels", "country"],
-    });
+  async findIn(placesId: number[]) {
+    const places = await PlaceRepository.findBy({ id: In(placesId) });
 
-    if (!place) {
-      throw boom.notFound(`place #${id} not found`);
+    if (places.length === 0) {
+      throw boom.notFound("places not found");
     }
 
-    return place;
+    return places;
   }
 
-  async create(data: {
-    name: string;
-    description: string;
-    countryId?: string;
-  }) {
-    const place = PlaceRepository.create(data);
-
-    if (data.countryId) {
-      const country = await countriesService.findOne(data.countryId);
-      place.country = country;
-    }
+  async create(data: { name: string; img?: string; countryId: string }) {
+    const { countryId, ...newPlace } = data;
+    const place = PlaceRepository.create(newPlace);
+    const country = await countryService.findOne(countryId);
+    place.country = country;
     return await PlaceRepository.save(place);
   }
 
-  async update(
-    id: string,
-    changes: { name: string; description: string; countryId?: string }
-  ) {
+  async update(id: string, changes: { name?: string; img?: string; countryId?: string }) {
     const place = await PlaceRepository.findOneBy({ id });
 
     if (!place) {
@@ -63,7 +49,7 @@ export class PlacesService {
     }
 
     if (changes.countryId) {
-      const country = await countriesService.findOne(changes.countryId);
+      const country = await countryService.findOne(changes.countryId);
       place.country = country;
     }
 
