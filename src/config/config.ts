@@ -12,4 +12,5 @@ export const config = {
   dbName: process.env.DB_NAME,
   //@ts-ignore
   dbPort: parseInt(process.env.DB_PORT, 10),
+  jwtSecret: process.env.JWT_SECRET || "",
 };

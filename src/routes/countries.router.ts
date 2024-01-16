@@ -1,6 +1,7 @@
 import express, { NextFunction, Request, Response } from "express";
+import passport from "passport";
 
-import { validatorHandler } from "../middleware/validator.handler";
+import { validatorHandler, validateUserRole } from "../middleware/index";
 import { getCountrySchema, createCountrySchema, updateCountrySchema, queryCountrySchema } from "../schemas/country.schema";
 import { CountryService } from "../services/country.service";
 
@@ -27,7 +28,7 @@ router.get("/:id", validatorHandler(getCountrySchema, "params"), async (req: Req
   }
 });
 
-router.post("/", validatorHandler(createCountrySchema, "body"), async (req: Request, res: Response, next: NextFunction) => {
+router.post("/", passport.authenticate("jwt", { session: false }), validateUserRole(["1"]), validatorHandler(createCountrySchema, "body"), async (req: Request, res: Response, next: NextFunction) => {
   const body = req.body;
   try {
     const country = await countryService.create(body);
@@ -37,7 +38,7 @@ router.post("/", validatorHandler(createCountrySchema, "body"), async (req: Requ
   }
 });
 
-router.put("/:id", validatorHandler(getCountrySchema, "params"), validatorHandler(updateCountrySchema, "body"), async (req: Request, res: Response, next: NextFunction) => {
+router.put("/:id", passport.authenticate("jwt", { session: false }), validateUserRole(["1"]), validatorHandler(getCountrySchema, "params"), validatorHandler(updateCountrySchema, "body"), async (req: Request, res: Response, next: NextFunction) => {
   const body = req.body;
   const { id } = req.params;
 
@@ -49,7 +50,7 @@ router.put("/:id", validatorHandler(getCountrySchema, "params"), validatorHandle
   }
 });
 
-router.delete("/:id", async (req: Request, res: Response, next: NextFunction) => {
+router.delete("/:id", passport.authenticate("jwt", { session: false }), validateUserRole(["1"]), async (req: Request, res: Response, next: NextFunction) => {
   const { id } = req.params;
 
   try {

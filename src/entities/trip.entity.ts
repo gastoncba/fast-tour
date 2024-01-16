@@ -1,4 +1,4 @@
-import { Column, PrimaryGeneratedColumn, Entity, ManyToMany, JoinTable } from "typeorm";
+import { Column, PrimaryGeneratedColumn, Entity, ManyToMany, JoinTable, ManyToOne, OneToMany } from "typeorm";
 
 import { Place } from "./place.entity";
 

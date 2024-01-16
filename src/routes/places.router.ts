@@ -1,6 +1,7 @@
 import express, { NextFunction, Request, Response } from "express";
+import passport from "passport";
 
-import { validatorHandler } from "../middleware/validator.handler";
+import { validatorHandler, validateUserRole } from "../middleware/index";
 import { createPlaceSchema, getPlaceSchema, updatePlaceSchema } from "../schemas/place.schema";
 import { PlaceService } from "../services/place.service";
 
@@ -27,7 +28,7 @@ router.get("/:id", validatorHandler(getPlaceSchema, "params"), async (req: Reque
   }
 });
 
-router.post("/", validatorHandler(createPlaceSchema, "body"), async (req: Request, res: Response, next: NextFunction) => {
+router.post("/", passport.authenticate("jwt", { session: false }), validateUserRole(["1"]), validatorHandler(createPlaceSchema, "body"), async (req: Request, res: Response, next: NextFunction) => {
   const body = req.body;
   try {
     const place = await placeService.create(body);
@@ -37,7 +38,7 @@ router.post("/", validatorHandler(createPlaceSchema, "body"), async (req: Reques
   }
 });
 
-router.put("/:id", validatorHandler(getPlaceSchema, "params"), validatorHandler(updatePlaceSchema, "body"), async (req: Request, res: Response, next: NextFunction) => {
+router.put("/:id", passport.authenticate("jwt", { session: false }), validateUserRole(["1"]), validatorHandler(getPlaceSchema, "params"), validatorHandler(updatePlaceSchema, "body"), async (req: Request, res: Response, next: NextFunction) => {
   const body = req.body;
   const { id } = req.params;
 
@@ -49,7 +50,7 @@ router.put("/:id", validatorHandler(getPlaceSchema, "params"), validatorHandler(
   }
 });
 
-router.delete("/:id", async (req: Request, res: Response, next: NextFunction) => {
+router.delete("/:id", passport.authenticate("jwt", { session: false }), validateUserRole(["1"]), async (req: Request, res: Response, next: NextFunction) => {
   const { id } = req.params;
 
   try {

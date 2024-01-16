@@ -1,7 +1,8 @@
 import express, { NextFunction, Request, Response } from "express";
+import passport from "passport";
 
 import { HotelService } from "../services/hotel.service";
-import { validatorHandler } from "../middleware/validator.handler";
+import { validatorHandler, validateUserRole } from "../middleware/index";
 import { getHotelSchema, createHotelSchema, updateHotelSchema } from "../schemas/hotel.schema";
 
 export const router = express.Router();
@@ -27,7 +28,7 @@ router.get("/:id", validatorHandler(getHotelSchema, "params"), async (req: Reque
   }
 });
 
-router.post("/", validatorHandler(createHotelSchema, "body"), async (req: Request, res: Response, next: NextFunction) => {
+router.post("/", passport.authenticate("jwt", { session: false }), validateUserRole(["1"]), validatorHandler(createHotelSchema, "body"), async (req: Request, res: Response, next: NextFunction) => {
   const { body } = req;
   try {
     const hotel = await hotelService.create(body);
@@ -37,7 +38,7 @@ router.post("/", validatorHandler(createHotelSchema, "body"), async (req: Reques
   }
 });
 
-router.put("/:id", validatorHandler(getHotelSchema, "params"), validatorHandler(updateHotelSchema, "body"), async (req: Request, res: Response, next: NextFunction) => {
+router.put("/:id", passport.authenticate("jwt", { session: false }), validateUserRole(["1"]), validatorHandler(getHotelSchema, "params"), validatorHandler(updateHotelSchema, "body"), async (req: Request, res: Response, next: NextFunction) => {
   const body = req.body;
   const { id } = req.params;
 
@@ -49,7 +50,7 @@ router.put("/:id", validatorHandler(getHotelSchema, "params"), validatorHandler(
   }
 });
 
-router.delete("/:id", async (req: Request, res: Response, next: NextFunction) => {
+router.delete("/:id", passport.authenticate("jwt", { session: false }), validateUserRole(["1"]), async (req: Request, res: Response, next: NextFunction) => {
   const { id } = req.params;
 
   try {
