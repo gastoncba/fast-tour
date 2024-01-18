@@ -28,7 +28,7 @@ router.get("/:id", validatorHandler(getTripSchema, "params"), async (req: Reques
   }
 });
 
-router.post("/", passport.authenticate("jwt", { session: false }), validateUserRole(["1"]), validatorHandler(createTripSchema, "body"), async (req: Request, res: Response, next: NextFunction) => {
+router.post("/", passport.authenticate("jwt", { session: false }), validateUserRole(["ADMIN"]), validatorHandler(createTripSchema, "body"), async (req: Request, res: Response, next: NextFunction) => {
   const { body } = req;
   try {
     const trip = await tripService.create(body);
@@ -38,7 +38,7 @@ router.post("/", passport.authenticate("jwt", { session: false }), validateUserR
   }
 });
 
-router.put("/:id", passport.authenticate("jwt", { session: false }), validateUserRole(["1"]), validatorHandler(getTripSchema, "params"), validatorHandler(updateTripSchema, "body"), async (req: Request, res: Response, next: NextFunction) => {
+router.put("/:id", passport.authenticate("jwt", { session: false }), validateUserRole(["ADMIN"]), validatorHandler(getTripSchema, "params"), validatorHandler(updateTripSchema, "body"), async (req: Request, res: Response, next: NextFunction) => {
   const body = req.body;
   const { id } = req.params;
 
@@ -50,7 +50,7 @@ router.put("/:id", passport.authenticate("jwt", { session: false }), validateUse
   }
 });
 
-router.delete("/:id", passport.authenticate("jwt", { session: false }), validateUserRole(["1"]), async (req: Request, res: Response, next: NextFunction) => {
+router.delete("/:id", passport.authenticate("jwt", { session: false }), validateUserRole(["ADMIN"]), async (req: Request, res: Response, next: NextFunction) => {
   const { id } = req.params;
 
   try {

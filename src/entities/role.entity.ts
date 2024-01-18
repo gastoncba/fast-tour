@@ -8,8 +8,13 @@ export class Role {
   id: string;
 
   @Column({ type: "varchar", length: 100 })
-  name: string;
+  name: RoleType;
 
   @OneToMany(() => User, (user) => user.role)
   users: User[];
+}
+
+export enum RoleType {
+  ADMIN = "ADMIN",
+  CUSTOMER = "CUSTOMER",
 }

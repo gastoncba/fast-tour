@@ -28,9 +28,8 @@ export class AuthService {
   signToken(user: any) {
     const payload = {
       sub: user.id,
-      role: user.role.id,
+      role: user.role.name,
     };
-    console.log("payload => ", payload);
     const { jwtSecret } = config;
     const { recoveryToken, password, ...userReturned } = user;
     const access_token = jwt.sign(payload, jwtSecret, { expiresIn: "1h" });

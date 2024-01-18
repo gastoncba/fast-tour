@@ -1,10 +1,10 @@
 import { Request, Response, NextFunction } from "express";
 import * as boom from "@hapi/boom";
 
-export const validateUserRole = (rols: any[]) => {
+export const validateUserRole = (roles: any[]) => {
   return (req: Request, res: Response, next: NextFunction) => {
     const user: any = req.user;
-    if (rols.includes(user.role.id)) {
+    if (roles.includes(user.role)) {
       next();
     } else {
       next(boom.unauthorized());

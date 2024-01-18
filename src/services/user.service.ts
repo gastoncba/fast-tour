@@ -27,11 +27,11 @@ export class UserService {
   }
 
   async findByEmail(email: string) {
-    return await UserRepository.findOneBy({ email });
+    return await UserRepository.findOne({ where: { email }, relations: ["role"] });
   }
 
   async findById(userId: string) {
-    const user = await UserRepository.findOneBy({ id: userId });
+    const user = await UserRepository.findOne({ where: { id: userId }, relations: ["role"] });
 
     if (!user) {
       throw boom.notFound(`user #${userId} not found`);

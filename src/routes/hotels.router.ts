@@ -28,7 +28,7 @@ router.get("/:id", validatorHandler(getHotelSchema, "params"), async (req: Reque
   }
 });
 
-router.post("/", passport.authenticate("jwt", { session: false }), validateUserRole(["1"]), validatorHandler(createHotelSchema, "body"), async (req: Request, res: Response, next: NextFunction) => {
+router.post("/", passport.authenticate("jwt", { session: false }), validateUserRole(["ADMIN"]), validatorHandler(createHotelSchema, "body"), async (req: Request, res: Response, next: NextFunction) => {
   const { body } = req;
   try {
     const hotel = await hotelService.create(body);
@@ -38,7 +38,7 @@ router.post("/", passport.authenticate("jwt", { session: false }), validateUserR
   }
 });
 
-router.put("/:id", passport.authenticate("jwt", { session: false }), validateUserRole(["1"]), validatorHandler(getHotelSchema, "params"), validatorHandler(updateHotelSchema, "body"), async (req: Request, res: Response, next: NextFunction) => {
+router.put("/:id", passport.authenticate("jwt", { session: false }), validateUserRole(["ADMIN"]), validatorHandler(getHotelSchema, "params"), validatorHandler(updateHotelSchema, "body"), async (req: Request, res: Response, next: NextFunction) => {
   const body = req.body;
   const { id } = req.params;
 
@@ -50,7 +50,7 @@ router.put("/:id", passport.authenticate("jwt", { session: false }), validateUse
   }
 });
 
-router.delete("/:id", passport.authenticate("jwt", { session: false }), validateUserRole(["1"]), async (req: Request, res: Response, next: NextFunction) => {
+router.delete("/:id", passport.authenticate("jwt", { session: false }), validateUserRole(["ADMIN"]), async (req: Request, res: Response, next: NextFunction) => {
   const { id } = req.params;
 
   try {

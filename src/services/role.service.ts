@@ -1,11 +1,12 @@
 import * as boom from "@hapi/boom";
 
 import { RoleRepository } from "../repositories/repository";
+import { RoleType } from "../entities/role.entity";
 
 export class RoleService {
   constructor() {}
 
-  async create(data: { name: string }) {
+  async create(data: { name: RoleType }) {
     const role = RoleRepository.create(data);
     return await RoleRepository.save(role);
   }
