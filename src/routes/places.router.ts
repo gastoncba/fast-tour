@@ -10,7 +10,7 @@ const placeService = new PlaceService();
 
 router.get("/", async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const places = await placeService.find();
+    const places = await placeService.find(req.query);
     res.json(places);
   } catch (error) {
     next(error);
