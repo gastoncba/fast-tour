@@ -11,6 +11,8 @@ export class CountryService {
   async find(query: QueryString.ParsedQs) {
     const { take, skip } = query;
     const options: FindManyOptions<Country> = {};
+    options.order = { id: "ASC" }
+
     if (take && skip) {
       options.take = parseInt(take as string);
       options.skip = parseInt(skip as string);

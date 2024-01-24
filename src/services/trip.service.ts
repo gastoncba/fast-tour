@@ -14,6 +14,7 @@ export class TripService {
   async find(query: QueryString.ParsedQs) {
     const { take, skip, maxPrice, minPrice, start, end, places } = query;
     const options: FindManyOptions<Trip> = {};
+    options.order = { id: "ASC" }
 
     if (take && skip) {
       options.take = parseInt(take as string);
