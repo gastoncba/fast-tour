@@ -3,6 +3,7 @@ import { Column, PrimaryGeneratedColumn, Entity, ManyToOne, OneToMany, ManyToMan
 import { Country } from "./country.entity";
 import { Trip } from "./trip.entity";
 import { Hotel } from "./hotel.entity";
+import { PlaceVisited } from "./placeVisited.entity";
 
 @Entity()
 export class Place {
@@ -27,6 +28,6 @@ export class Place {
   @OneToMany(() => Hotel, (hotel) => hotel.place)
   hotels: Hotel[];
 
-  // @OneToMany(() => PlaceVisited, (placeVisited) => placeVisited.place)
-  // visiteds: PlaceVisited[];
+  @OneToMany(() => PlaceVisited, (placeVisited) => placeVisited.place)
+  visiteds: PlaceVisited[];
 }

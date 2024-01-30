@@ -1,6 +1,7 @@
 import { Column, PrimaryGeneratedColumn, Entity, ManyToOne, OneToMany } from "typeorm";
 
 import { Place } from "./place.entity";
+import { PlaceVisited } from "./placeVisited.entity";
 
 @Entity()
 export class Hotel {
@@ -10,7 +11,7 @@ export class Hotel {
   @Column({ type: "varchar", length: 50 })
   name: string;
 
-  @Column({ type: "varchar", length: 50 , nullable: true })
+  @Column({ type: "varchar", length: 50, nullable: true })
   description: string;
 
   @Column({ type: "int" })
@@ -22,7 +23,6 @@ export class Hotel {
   @ManyToOne(() => Place, (place) => place.hotels)
   place: Place;
 
-  // @OneToMany(() => PlaceVisited, (placeVisited) => placeVisited.hotel)
-  // visiteds: PlaceVisited[];
-
+  @OneToMany(() => PlaceVisited, (placeVisited) => placeVisited.hotel)
+  visiteds: PlaceVisited[];
 }

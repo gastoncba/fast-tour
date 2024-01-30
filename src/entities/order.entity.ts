@@ -2,7 +2,7 @@ import { Entity, PrimaryGeneratedColumn, ManyToOne, Column, OneToMany } from "ty
 
 import { User } from "./user.entity";
 import { Trip } from "./trip.entity";
-import { PlaceVisited } from "./PlaceVisited.entity";
+import { PlaceVisited } from "./placeVisited.entity";
 
 @Entity()
 export class Order {
@@ -18,7 +18,7 @@ export class Order {
   @ManyToOne(() => Trip, (trip) => trip.orders)
   trip: Trip;
 
-  @OneToMany(() => PlaceVisited, (placeVisited) => placeVisited.order)
+  @OneToMany(() => PlaceVisited, (placeVisited) => placeVisited.order, { onDelete: "CASCADE" })
   placesVisited: PlaceVisited[];
 
   @Column({ type: "int", nullable: true })

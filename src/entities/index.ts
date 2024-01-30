@@ -5,4 +5,4 @@ export { Trip } from "./trip.entity";
 export { User } from "./user.entity";
 export { Order } from "./order.entity";
 export { Role } from "./role.entity";
-//export { PlaceVisited } from "./placeVisited.entity"
+export { PlaceVisited } from "./placeVisited.entity"
