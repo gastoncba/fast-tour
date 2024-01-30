@@ -42,7 +42,7 @@ export class PlaceService {
     return places;
   }
 
-  async create(data: { name: string; img?: string; countryId: string }) {
+  async create(data: { name: string; description?: string; img?: string; countryId: string }) {
     const { countryId, ...newPlace } = data;
     const place = PlaceRepository.create(newPlace);
     const country = await countryService.findOne(countryId);
@@ -50,7 +50,7 @@ export class PlaceService {
     return await PlaceRepository.save(place);
   }
 
-  async update(id: string, changes: { name?: string; img?: string; countryId?: string }) {
+  async update(id: string, changes: { name?: string; description?: string; img?: string; countryId?: string }) {
     const place = await PlaceRepository.findOneBy({ id });
 
     if (!place) {

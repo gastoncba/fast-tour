@@ -1,4 +1,4 @@
-import { Column, PrimaryGeneratedColumn, Entity, ManyToOne } from "typeorm";
+import { Column, PrimaryGeneratedColumn, Entity, ManyToOne, OneToMany } from "typeorm";
 
 import { Place } from "./place.entity";
 
@@ -21,4 +21,8 @@ export class Hotel {
 
   @ManyToOne(() => Place, (place) => place.hotels)
   place: Place;
+
+  // @OneToMany(() => PlaceVisited, (placeVisited) => placeVisited.hotel)
+  // visiteds: PlaceVisited[];
+
 }

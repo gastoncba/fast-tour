@@ -3,7 +3,7 @@ import JoiDate from "@joi/date";
 
 const id = Joi.number().integer();
 const name = Joi.string().min(3).max(50);
-const description = Joi.string().allow(null)
+const description = Joi.string().allow(null);
 const img = Joi.string().allow(null);
 const price = Joi.number().integer().positive();
 const startDate = Joi.extend(JoiDate).date().format("YYYY-MM-DD");
@@ -16,7 +16,7 @@ const take = Joi.number().integer().positive();
 const skip = Joi.number().integer().positive();
 const start = Joi.extend(JoiDate).date().format("YYYY-MM-DD");
 const end = Joi.extend(JoiDate).date().format("YYYY-MM-DD");
-const places = Joi.string()
+const places = Joi.string();
 
 export const createTripSchema = Joi.object({
   name: name.required(),

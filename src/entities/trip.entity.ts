@@ -1,6 +1,7 @@
 import { Column, PrimaryGeneratedColumn, Entity, ManyToMany, JoinTable, ManyToOne, OneToMany } from "typeorm";
 
 import { Place } from "./place.entity";
+import { Order } from "./order.entity";
 
 @Entity()
 export class Trip {
@@ -28,4 +29,7 @@ export class Trip {
   @ManyToMany(() => Place, (place) => place.trips)
   @JoinTable()
   places: Place[];
+
+  @OneToMany(() => Order, (order) => order.trip)
+  orders: Order[];
 }

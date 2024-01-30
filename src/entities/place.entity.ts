@@ -13,6 +13,9 @@ export class Place {
   name: string;
 
   @Column({ type: "varchar", length: 255, nullable: true })
+  description: string;
+
+  @Column({ type: "varchar", length: 255, nullable: true })
   img: string;
 
   @ManyToOne(() => Country, (country) => country.places)
@@ -23,4 +26,7 @@ export class Place {
 
   @OneToMany(() => Hotel, (hotel) => hotel.place)
   hotels: Hotel[];
+
+  // @OneToMany(() => PlaceVisited, (placeVisited) => placeVisited.place)
+  // visiteds: PlaceVisited[];
 }
