@@ -14,7 +14,7 @@ export class HotelService {
   }
 
   async findOne(id: string) {
-    const hotel = await HotelRepository.findOneBy({ id });
+    const hotel = await HotelRepository.findOne({ relations: ["place", "place.country"], where: { id } });
     if (!hotel) {
       throw boom.notFound(`hotel #${id} not found`);
     }
