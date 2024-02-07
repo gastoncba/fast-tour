@@ -23,3 +23,7 @@ export const updateHotelSchema = Joi.object({
 export const getHotelSchema = Joi.object({
   id: id.required()
 })
+
+export const queryHotelSchema = Joi.object({
+  name
+})

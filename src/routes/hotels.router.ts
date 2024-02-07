@@ -3,14 +3,14 @@ import passport from "passport";
 
 import { HotelService } from "../services/hotel.service";
 import { validatorHandler, validateUserRole } from "../middleware/index";
-import { getHotelSchema, createHotelSchema, updateHotelSchema } from "../schemas/hotel.schema";
+import { getHotelSchema, createHotelSchema, updateHotelSchema, queryHotelSchema } from "../schemas/hotel.schema";
 
 export const router = express.Router();
 const hotelService = new HotelService();
 
-router.get("/", async (req: Request, res: Response, next: NextFunction) => {
+router.get("/", validatorHandler(queryHotelSchema, "query"), async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const hotels = await hotelService.find();
+    const hotels = await hotelService.find(req.query);
     res.json(hotels);
   } catch (error) {
     next(error);

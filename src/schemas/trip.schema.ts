@@ -53,4 +53,5 @@ export const queryTripSchema = Joi.object({
   start,
   end,
   places,
+  name
 });

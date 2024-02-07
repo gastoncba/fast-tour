@@ -1,6 +1,6 @@
 import * as boom from "@hapi/boom";
 import QueryString from "qs";
-import { FindManyOptions } from "typeorm";
+import { FindManyOptions, ILike } from "typeorm";
 
 import { Country } from "../entities";
 import { CountryRepository } from "../repositories/repository";
@@ -9,13 +9,20 @@ export class CountryService {
   constructor() {}
 
   async find(query: QueryString.ParsedQs) {
-    const { take, skip } = query;
+    const { take, skip, name } = query;
     const options: FindManyOptions<Country> = {};
     options.order = { id: "ASC" }
 
     if (take && skip) {
       options.take = parseInt(take as string);
       options.skip = parseInt(skip as string);
+    }
+
+    if (name) {
+      options.where = {
+        ...options.where,
+        name: ILike(`%${name}%`),
+      };
     }
 
     const countries = CountryRepository.find(options);

@@ -1,14 +1,28 @@
+import QueryString from "qs";
 import * as boom from "@hapi/boom";
+import { FindManyOptions, ILike } from "typeorm";
 
 import { HotelRepository } from "../repositories/repository";
 import { PlaceService } from "./place.service";
+import { Hotel } from "../entities";
 
 const placeService = new PlaceService();
 
 export class HotelService {
   constructor() {}
 
-  async find() {
+  async find(query: QueryString.ParsedQs) {
+    const { name } = query;
+    const options: FindManyOptions<Hotel> = {};
+    options.order = { id: "ASC" }
+
+    if (name) {
+      options.where = {
+        ...options.where,
+        name: ILike(`%${name}%`),
+      };
+    }
+
     const hotels = await HotelRepository.find();
     return hotels;
   }

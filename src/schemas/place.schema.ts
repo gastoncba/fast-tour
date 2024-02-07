@@ -23,3 +23,8 @@ export const updatePlaceSchema = Joi.object({
 export const getPlaceSchema = Joi.object({
   id: id.required(),
 });
+
+export const queryPlaceSchema = Joi.object({
+  name,
+  countryId
+})

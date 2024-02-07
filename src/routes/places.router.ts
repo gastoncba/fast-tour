@@ -2,13 +2,13 @@ import express, { NextFunction, Request, Response } from "express";
 import passport from "passport";
 
 import { validatorHandler, validateUserRole } from "../middleware/index";
-import { createPlaceSchema, getPlaceSchema, updatePlaceSchema } from "../schemas/place.schema";
+import { createPlaceSchema, getPlaceSchema, queryPlaceSchema, updatePlaceSchema } from "../schemas/place.schema";
 import { PlaceService } from "../services/place.service";
 
 export const router = express.Router();
 const placeService = new PlaceService();
 
-router.get("/", async (req: Request, res: Response, next: NextFunction) => {
+router.get("/", validatorHandler(queryPlaceSchema, "query"), async (req: Request, res: Response, next: NextFunction) => {
   try {
     const places = await placeService.find(req.query);
     res.json(places);
