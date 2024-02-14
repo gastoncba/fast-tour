@@ -24,13 +24,13 @@ export class TripService {
     if (minPrice && maxPrice) {
       options.where = {
         ...options.where,
-        price: Between(parseInt(minPrice as string), parseInt(maxPrice as string)),
+        price: Between(parseFloat(minPrice as string), parseFloat(maxPrice as string)),
       };
     }
 
     if (start && end) {
-      const arrayStart = (start as string).split("/");
-      const arrayEnd = (end as string).split("/");
+      const arrayStart = (start as string).split("-");
+      const arrayEnd = (end as string).split("-");
       const formattedStart = new Date(parseInt(arrayStart[2]), parseInt(arrayStart[1]) - 1, parseInt(arrayStart[0]));
       const formattedEnd = new Date(parseInt(arrayEnd[2]), parseInt(arrayEnd[1]) - 1, parseInt(arrayEnd[0]));
       options.where = {

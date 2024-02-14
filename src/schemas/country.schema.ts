@@ -24,5 +24,5 @@ export const getCountrySchema = Joi.object({
 export const queryCountrySchema = Joi.object({
   take,
   skip,
-  name
+  name: Joi.string().max(50)
 });

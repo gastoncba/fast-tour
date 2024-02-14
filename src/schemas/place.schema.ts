@@ -25,6 +25,6 @@ export const getPlaceSchema = Joi.object({
 });
 
 export const queryPlaceSchema = Joi.object({
-  name,
+  name: Joi.string().max(50),
   countryId
 })

@@ -5,13 +5,13 @@ const id = Joi.number().integer();
 const name = Joi.string().min(3).max(50);
 const description = Joi.string().allow(null);
 const img = Joi.string().allow(null);
-const price = Joi.number().integer().positive();
+const price = Joi.number().positive();
 const startDate = Joi.extend(JoiDate).date().format("YYYY-MM-DD");
 const endDate = Joi.extend(JoiDate).date().format("YYYY-MM-DD");
 const placesId = Joi.array().items(Joi.number().positive());
 
-const maxPrice = Joi.number().integer().positive();
-const minPrice = Joi.number().integer().positive().min(0);
+const maxPrice = Joi.number().positive();
+const minPrice = Joi.number().positive().min(0);
 const take = Joi.number().integer().positive();
 const skip = Joi.number().integer().positive();
 const start = Joi.extend(JoiDate).date().format("YYYY-MM-DD");
@@ -53,5 +53,5 @@ export const queryTripSchema = Joi.object({
   start,
   end,
   places,
-  name
+  name: Joi.string().max(50)
 });

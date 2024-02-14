@@ -23,7 +23,7 @@ export class HotelService {
       };
     }
 
-    const hotels = await HotelRepository.find();
+    const hotels = await HotelRepository.find(options);
     return hotels;
   }
 

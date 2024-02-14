@@ -25,5 +25,5 @@ export const getHotelSchema = Joi.object({
 })
 
 export const queryHotelSchema = Joi.object({
-  name
+  name: Joi.string().max(50)
 })
