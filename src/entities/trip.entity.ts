@@ -14,7 +14,7 @@ export class Trip {
   @Column({ type: "varchar", length: 255, nullable: true })
   description: string;
 
-  @Column({ type: "money", nullable: true })
+  @Column({ type: "real", nullable: true })
   price: number;
 
   @Column({ type: "date" })
