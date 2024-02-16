@@ -1,16 +1,42 @@
-import express, { Request , Response} from 'express'
+import express, { Request, Response, NextFunction } from "express";
+import passport from "passport";
 
-import { UsersService } from '../services/users.service';
+import { UserService } from "../services/user.service";
+import { createUserSchema, updateUserSchema } from "../schemas/user.schema";
+import { validatorHandler } from "../middleware/validator.handler";
 
-export const router = express.Router()
-const usersService = new UsersService();
+export const router = express.Router();
+const userService = new UserService();
 
-router.get('/', async (req:Request, res: Response) => {
+router.post("/create", validatorHandler(createUserSchema, "body"), async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const user = await usersService.find()
-    res.json(user)
+    const { body } = req;
+    const user = await userService.create(body);
+    res.status(201).json(user);
   } catch (error) {
-    console.log(error)
+    next(error);
   }
+});
 
+router.get("/", passport.authenticate("jwt", { session: false }), async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const payload: any = req.user;
+    const userId = payload.sub;
+    const user = await userService.findById(userId);
+    res.json(user);
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.put("/update", passport.authenticate("jwt", { session: false }), validatorHandler(updateUserSchema, "body"), async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const payload: any = req.user;
+    const userId = payload.sub;
+    const changes = req.body;
+    const updatedUser = await userService.update(userId, changes);
+    res.json(updatedUser);
+  } catch (error) {
+    next(error);
+  }
 });

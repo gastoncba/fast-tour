@@ -1,13 +1,9 @@
-import {
-  Column,
-  PrimaryGeneratedColumn,
-  Entity,
-  ManyToOne,
-  OneToMany
-} from "typeorm";
+import { Column, PrimaryGeneratedColumn, Entity, ManyToOne, OneToMany, ManyToMany } from "typeorm";
 
 import { Country } from "./country.entity";
-import { Travel } from "./travel.entity";
+import { Trip } from "./trip.entity";
+import { Hotel } from "./hotel.entity";
+import { PlaceVisited } from "./placeVisited.entity";
 
 @Entity()
 export class Place {
@@ -17,12 +13,21 @@ export class Place {
   @Column({ type: "varchar", length: 255 })
   name: string;
 
-  @Column({type: 'varchar', length: 255, nullable: true})
+  @Column({ type: "varchar", length: 255, nullable: true })
+  description: string;
+
+  @Column({ type: "varchar", length: 255, nullable: true })
   img: string;
 
   @ManyToOne(() => Country, (country) => country.places)
   country: Country;
 
-  @OneToMany(() => Travel, (travel) => travel.place)
-  travels: Travel[]
+  @ManyToMany(() => Trip, (trip) => trip.places)
+  trips: Trip[];
+
+  @OneToMany(() => Hotel, (hotel) => hotel.place)
+  hotels: Hotel[];
+
+  @OneToMany(() => PlaceVisited, (placeVisited) => placeVisited.place)
+  visiteds: PlaceVisited[];
 }
