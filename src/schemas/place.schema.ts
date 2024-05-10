@@ -1,10 +1,10 @@
 import Joi from "joi";
 
-const id = Joi.number().integer();
+const id = Joi.number().integer().positive();
 const name = Joi.string().min(3).max(50);
 const description = Joi.string().allow(null);
 const img = Joi.string().allow(null);
-const countryId = Joi.number().integer();
+const countryId = Joi.number().integer().positive();
 
 export const createPlaceSchema = Joi.object({
   name: name.required(),

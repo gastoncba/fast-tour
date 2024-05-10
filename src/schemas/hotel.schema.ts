@@ -1,10 +1,10 @@
 import Joi from "joi";
 
-const id = Joi.number().integer()
+const id = Joi.number().integer().positive()
 const name = Joi.string().min(3).max(50)
 const description = Joi.string().min(3).max(50).allow(null)
 const stars = Joi.number().positive().min(1).max(5)
-const placeId = Joi.number().integer()
+const placeId = Joi.number().integer().positive()
 
 export const createHotelSchema = Joi.object({
   name: name.required(),

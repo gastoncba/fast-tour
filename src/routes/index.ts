@@ -6,6 +6,7 @@ import { router as countriesRouter } from "./countries.router";
 import { router as hotelsRouter } from "./hotels.router";
 import { router as rolesRouter } from "./roles.router";
 import { router as authRouter } from "./auth.router";
+import { router as orderRouter } from './order.router'
 
 export const routerApi = (app: Express) => {
   const router = express.Router();
@@ -17,4 +18,5 @@ export const routerApi = (app: Express) => {
   router.use("/hotels", hotelsRouter);
   router.use("/roles", rolesRouter);
   router.use("/auth", authRouter);
+  router.use("/order", orderRouter);
 };

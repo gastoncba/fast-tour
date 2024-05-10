@@ -4,7 +4,7 @@ const firstName = Joi.string();
 const lastName = Joi.string();
 const email = Joi.string().email();
 const password = Joi.string();
-const roleId = Joi.number().positive();
+const roleId = Joi.number().positive().integer();
 
 export const createUserSchema = Joi.object({
   firstName: firstName.required(),
