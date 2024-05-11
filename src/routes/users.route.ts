@@ -4,9 +4,19 @@ import passport from "passport";
 import { UserService } from "../services/user.service";
 import { createUserSchema, updateUserSchema } from "../schemas/user.schema";
 import { validatorHandler } from "../middleware/validator.handler";
+import { validateUserRole } from "../middleware";
 
 export const router = express.Router();
 const userService = new UserService();
+
+router.get("/all", passport.authenticate("jwt", { session: false }), validateUserRole(["ADMIN"]), async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const users = await userService.find();
+    res.json(users);
+  } catch (error) {
+    next(error);
+  }
+});
 
 router.post("/create", validatorHandler(createUserSchema, "body"), async (req: Request, res: Response, next: NextFunction) => {
   try {

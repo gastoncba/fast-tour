@@ -4,7 +4,7 @@ import { User } from "./user.entity";
 import { Trip } from "./trip.entity";
 import { PlaceVisited } from "./placeVisited.entity";
 
-@Entity()
+@Entity({ name: "orders" })
 export class Order {
   @PrimaryGeneratedColumn()
   id: string;
@@ -32,4 +32,7 @@ export class Order {
 
   @Column({ type: "varchar", length: 255, nullable: true })
   email: string;
+
+  @Column({ type: "real" })
+  total: number;
 }

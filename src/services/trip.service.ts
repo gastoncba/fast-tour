@@ -118,4 +118,16 @@ export class TripService {
 
     return await TripRepository.delete(id);
   }
+
+  async getTop(limit: number) {
+    const tripTop = await TripRepository.createQueryBuilder("trip")
+      .select("trip.*")
+      .addSelect('COUNT("o"."tripId")', "sales_total")
+      .innerJoin("orders", "o", "o.tripId = trip.id")
+      .groupBy("trip.id")
+      .orderBy("sales_total", "DESC")
+      .limit(limit)
+      .getRawMany();
+    return tripTop;
+  }
 }

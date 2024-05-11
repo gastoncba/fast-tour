@@ -14,7 +14,7 @@ export class PlaceService {
   async find(query: QueryString.ParsedQs) {
     const { countryId, name } = query;
     const options: FindManyOptions<Place> = {};
-    options.order = { id: "ASC" }
+    options.order = { id: "ASC" };
     options.relations = ["country", "hotels"];
 
     if (countryId) {
@@ -82,5 +82,19 @@ export class PlaceService {
     }
 
     return await PlaceRepository.delete(id);
+  }
+
+  async getTop(limit: number) {
+    const placeTop = await PlaceRepository.createQueryBuilder("trip")
+      .select("p.*")
+      .addSelect('COUNT("o"."tripId")', "sales_total")
+      .innerJoin("orders", "o", "o.tripId = trip.id")
+      .innerJoin("trip_places_place", "tpp", "tpp.tripId = trip.id")
+      .innerJoin("place", "p", "tpp.placeId = p.id")
+      .groupBy("p.id")
+      .orderBy("sales_total", "DESC")
+      .limit(limit)
+      .getRawMany();
+    return placeTop;
   }
 }

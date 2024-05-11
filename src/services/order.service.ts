@@ -1,36 +1,90 @@
+import * as boom from "@hapi/boom";
 import { FindManyOptions } from "typeorm";
-import { Order, PlaceVisited, User } from "../entities";
-import { OrderRepository } from "../repositories/repository";
-import { PlaceVisitedService } from "./placeVisited.service";
-import { TripService } from "./trip.service";
-import { UserService } from "./user.service";
 
-const placeVisitedService = new PlaceVisitedService();
+import { Hotel, Order, Place, PlaceVisited, Trip, User } from "../entities";
+import { OrderRepository } from "../repositories/repository";
+import { appDataSource } from "../database/database";
+import { TripService } from "./trip.service";
+import { CountryService } from "./country.service";
+import { PlaceService } from "./place.service";
+
 const tripService = new TripService();
-const userService = new UserService();
+const countryService = new CountryService();
+const placeService = new PlaceService();
+
+interface RankingStrategy {
+  calculateRanking(limit: number): Promise<any[]>;
+}
+
+export class CountryRanking implements RankingStrategy {
+  async calculateRanking(limit: number): Promise<any[]> {
+    return await countryService.getTop(limit);
+  }
+}
+
+export class PlaceRanking implements RankingStrategy {
+  async calculateRanking(limit: number): Promise<any[]> {
+    return await placeService.getTop(limit);
+  }
+}
+
+export class TripRanking implements RankingStrategy {
+  async calculateRanking(limit: number): Promise<any[]> {
+    return await tripService.getTop(limit);
+  }
+}
 
 export class OrderService {
   constructor() {}
 
-  async create(data: { purchaseDate: string; userId: number | null; tripId: number; placesVisited: { placeId: number; hotelId: number }[]; numberPeople: number; firstName?: string; lastName?: string; email?: string }) {
-    let visiteds: PlaceVisited[] = [];
+  async create(data: { purchaseDate: string; userId: number | null; tripId: number; placesVisited: { placeId: number; hotelId: number }[]; numberPeople: number; firstName?: string; lastName?: string; email?: string; total: number }) {
+    const queryRunner = appDataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
 
+    let visiteds: PlaceVisited[] = [];
     const { placesVisited, tripId, userId, ...newData } = data;
 
-    for (const visited of placesVisited) {
-      const newVisted = await placeVisitedService.create(visited);
-      visiteds.push(newVisted);
+    try {
+      for (const visited of placesVisited) {
+        const hotel = await queryRunner.manager.findOne(Hotel, { where: { id: visited.hotelId.toString() } });
+        const place = await queryRunner.manager.findOne(Place, { where: { id: visited.placeId.toString() } });
+
+        if (!hotel || !place) {
+          throw boom.notFound(`place or hotel not found`);
+        }
+
+        const newVisited = queryRunner.manager.create(PlaceVisited, { hotel, place });
+        const saveVisited = await queryRunner.manager.save(newVisited);
+        visiteds.push(saveVisited);
+      }
+
+      const trip = await queryRunner.manager.findOne(Trip, { where: { id: tripId.toString() } });
+
+      if (!trip) {
+        throw boom.notFound(`trip #${tripId} not found`);
+      }
+
+      let user: User | undefined = undefined;
+      if (userId) {
+        let user_data = await queryRunner.manager.findOne(User, { where: { id: userId.toString() } });
+        if (!user_data) {
+          throw boom.notFound(`user #${userId} not found`);
+        }
+        user = user_data;
+      }
+
+      const order = queryRunner.manager.create(Order, { ...newData, placesVisited: visiteds, trip, user });
+      const newOrder = await queryRunner.manager.save(order);
+
+      await queryRunner.commitTransaction();
+      return newOrder;
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      throw boom.badRequest("ERROR IN CREATE ORDER " + error);
+    } finally {
+      await queryRunner.release();
     }
-
-    const trip = await tripService.findOne(tripId.toString());
-
-    let user: User | undefined = undefined;
-    if (userId) {
-      user = await userService.findUserComplete(userId.toString());
-    }
-
-    const order = OrderRepository.create({ ...newData, placesVisited: visiteds, trip, user });
-    return await OrderRepository.save(order);
   }
 
   async find() {
@@ -38,5 +92,38 @@ export class OrderService {
     options.order = { id: "ASC" };
     options.relations = ["trip", "user", "placesVisited", "placesVisited.hotel", "placesVisited.place"];
     return await OrderRepository.find(options);
+  }
+
+  async findOne(id: string) {
+    const order = await OrderRepository.findOne({ where: { id }, relations: ["placesVisited"] });
+
+    if (!order) {
+      throw boom.notFound(`order #${id} not found`);
+    }
+
+    return order;
+  }
+
+  async remove(id: string) {
+    const queryRunner = appDataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+
+    try {
+      const order = await this.findOne(id);
+      await queryRunner.manager.remove(order.placesVisited);
+      await queryRunner.manager.remove(order);
+
+      await queryRunner.commitTransaction();
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      throw boom.badRequest("ERROR IN DELETE ORDER " + error);
+    } finally {
+      await queryRunner.release();
+    }
+  }
+
+  async getRankings(strategy: RankingStrategy, limit: number = 10): Promise<any[]> {
+    return await strategy.calculateRanking(limit);
   }
 }

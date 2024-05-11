@@ -9,6 +9,10 @@ const roleService = new RoleService();
 export class UserService {
   constructor() {}
 
+  async find() {
+    return await UserRepository.find();
+  }
+
   async create(data: { firstName: string; lastName: string; email: string; password: string; roleId: string }) {
     const { roleId, ...newData } = data;
     const role = await roleService.findById(roleId);
@@ -69,10 +73,4 @@ export class UserService {
     UserRepository.merge(user, { password, recoveryToken: null });
     return await UserRepository.save(user);
   }
-
-  // async updateAll(userId: string, brandId: string, changes: { firstName?: string; lastName?: string; email?: string; brandName?: string }) {
-  //   const { brandName, ...userChanges } = changes;
-  //   await brandService.update(brandId, { name: brandName });
-  //   return await this.update(userId, userChanges);
-  // }
 }
