@@ -1,4 +1,7 @@
 import express, { Express } from "express";
+import passport from "passport";
+
+import { validateUserRole } from "../middleware";
 import { router as tripsRouter } from "./trips.router";
 import { router as usersRouter } from "./users.route";
 import { router as placesRouter } from "./places.router";
@@ -20,5 +23,5 @@ export const routerApi = (app: Express) => {
   router.use("/roles", rolesRouter);
   router.use("/auth", authRouter);
   router.use("/order", orderRouter);
-  router.use("/statistics", StatisticRouter);
+  router.use("/statistics", passport.authenticate("jwt", { session: false }), validateUserRole(["ADMIN"]), StatisticRouter);
 };

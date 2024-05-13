@@ -126,4 +126,26 @@ export class OrderService {
   async getRankings(strategy: RankingStrategy, limit: number = 10): Promise<any[]> {
     return await strategy.calculateRanking(limit);
   }
+
+  async getMonthlyTripCounts(year: number): Promise<{ month: string; tripCount: number }[]> {
+    const orders = await OrderRepository.createQueryBuilder("orders")
+      .select("to_char(DATE_TRUNC('month', orders.purchaseDate), 'Month') AS month")
+      .addSelect("COUNT(orders.id) AS trip_count")
+      .addGroupBy("to_char(DATE_TRUNC('month', orders.purchaseDate), 'Month')")
+      .where("EXTRACT(year FROM orders.purchaseDate) = :year", { year })
+      .orderBy("to_char(DATE_TRUNC('month', orders.purchaseDate), 'Month')")
+      .getRawMany();
+
+    const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+
+    const result = months.map((month) => {
+      const existingMonth = orders.find((order) => order.month.trim() === month);
+      return {
+        month: existingMonth ? existingMonth.month.trim() : month,
+        tripCount: existingMonth ? parseInt(existingMonth.trip_count) : 0,
+      };
+    });
+
+    return result;
+  }
 }
