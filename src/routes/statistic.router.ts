@@ -28,8 +28,8 @@ router.get("/ranking", async (req: Request, res: Response, next: NextFunction) =
 router.get("/frequency/:year", validatorHandler(getFrequencySchema, "params"), async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { year } = req.params;
-    const orders = await statisticService.getMonthlyTripCounts(parseInt(year));
-    res.status(200).json(orders);
+    const trips = await statisticService.getMonthlyTripCounts(parseInt(year));
+    res.status(200).json(trips);
   } catch (error) {
     next(error);
   }
