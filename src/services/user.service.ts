@@ -3,7 +3,9 @@ import bcrypt from "bcrypt";
 
 import { UserRepository } from "../repositories/repository";
 import { RoleService } from "./role.service";
+import { OrderService } from "./order.service";
 
+const orderService = new OrderService();
 const roleService = new RoleService();
 
 export class UserService {
@@ -62,7 +64,8 @@ export class UserService {
     }
 
     UserRepository.merge(user, changes);
-    return await UserRepository.save(user);
+    await UserRepository.save(user);
+    return await this.findById(id);
   }
 
   async updatePassword(id: string, password: string) {
@@ -72,5 +75,10 @@ export class UserService {
     }
     UserRepository.merge(user, { password, recoveryToken: null });
     return await UserRepository.save(user);
+  }
+
+  async searchOrders(userId: string) {
+    await this.findUserComplete(userId);
+    return await orderService.findOrderByUser(userId);
   }
 }

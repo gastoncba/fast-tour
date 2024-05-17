@@ -148,4 +148,8 @@ export class OrderService {
 
     return result;
   }
+
+  async findOrderByUser(userId: string) {
+    return await OrderRepository.find({ where: { user: { id: userId } }, relations: ["trip", "placesVisited", "placesVisited.hotel", "placesVisited.place"] });
+  }
 }

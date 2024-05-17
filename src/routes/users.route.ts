@@ -50,3 +50,13 @@ router.put("/update", passport.authenticate("jwt", { session: false }), validato
     next(error);
   }
 });
+
+router.get("/:userId/orders", async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { userId } = req.params;
+    const orders = await userService.searchOrders(userId);
+    res.json(orders);
+  } catch (error) {
+    next(error);
+  }
+});
