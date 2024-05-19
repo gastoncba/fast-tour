@@ -36,7 +36,7 @@ router.delete("/:id", passport.authenticate("jwt", { session: false }), validate
   }
 });
 
-router.put("/:id/confirm", async (req: Request, res: Response, next: NextFunction) => {
+router.put("/:id/confirm", passport.authenticate("jwt", { session: false }), validateUserRole(["ADMIN"]), validatorHandler(getOrderSchema, "params"), async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { id } = req.params;
     const order = await orderService.confirm(id);
@@ -46,7 +46,7 @@ router.put("/:id/confirm", async (req: Request, res: Response, next: NextFunctio
   }
 });
 
-router.put("/:id/pay", async (req: Request, res: Response, next: NextFunction) => {
+router.put("/:id/pay", passport.authenticate("jwt", { session: false }), validateUserRole(["ADMIN"]), validatorHandler(getOrderSchema, "params"), async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { id } = req.params;
     const order = await orderService.pay(id);
@@ -56,7 +56,7 @@ router.put("/:id/pay", async (req: Request, res: Response, next: NextFunction) =
   }
 });
 
-router.put("/:id/complete", async (req: Request, res: Response, next: NextFunction) => {
+router.put("/:id/complete", passport.authenticate("jwt", { session: false }), validateUserRole(["ADMIN"]), validatorHandler(getOrderSchema, "params"), async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { id } = req.params;
     const order = await orderService.complete(id);
@@ -66,7 +66,7 @@ router.put("/:id/complete", async (req: Request, res: Response, next: NextFuncti
   }
 });
 
-router.put("/:id/cancel", async (req: Request, res: Response, next: NextFunction) => {
+router.put("/:id/cancel", passport.authenticate("jwt", { session: false }), validateUserRole(["ADMIN"]), validatorHandler(getOrderSchema, "params"), async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { id } = req.params;
     const order = await orderService.cancel(id);
