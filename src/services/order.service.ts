@@ -1,7 +1,7 @@
 import * as boom from "@hapi/boom";
 import { FindManyOptions } from "typeorm";
 
-import { Hotel, Order, Place, PlaceVisited, Trip, User } from "../entities";
+import { ConfirmedOrderState, Hotel, Order, PendingOrderState, Place, PlaceVisited, Trip, User } from "../entities";
 import { OrderRepository } from "../repositories/repository";
 import { appDataSource } from "../database/database";
 import { TripService } from "./trip.service";
@@ -75,6 +75,7 @@ export class OrderService {
       }
 
       const order = queryRunner.manager.create(Order, { ...newData, placesVisited: visiteds, trip, user });
+      order.state = new PendingOrderState();
       const newOrder = await queryRunner.manager.save(order);
 
       await queryRunner.commitTransaction();
@@ -90,8 +91,13 @@ export class OrderService {
   async find() {
     const options: FindManyOptions<Order> = {};
     options.order = { id: "ASC" };
-    options.relations = ["trip", "user", "placesVisited", "placesVisited.hotel", "placesVisited.place"];
-    return await OrderRepository.find(options);
+    options.relations = ["trip", "user", "placesVisited", "placesVisited.hotel", "placesVisited.place", "state"];
+
+    const orders = await OrderRepository.find(options);
+    return orders.map((order) => ({
+      ...order,
+      state: order.state.name,
+    }));
   }
 
   async findOne(id: string) {
@@ -151,5 +157,29 @@ export class OrderService {
 
   async findOrderByUser(userId: string) {
     return await OrderRepository.find({ where: { user: { id: userId } }, relations: ["trip", "placesVisited", "placesVisited.hotel", "placesVisited.place"] });
+  }
+
+  async confirm(orderId: string) {
+    const order = await this.findOne(orderId);
+    order.confirm();
+    return await OrderRepository.save(order);
+  }
+
+  async complete(orderId: string) {
+    const order = await this.findOne(orderId);
+    order.complete();
+    return await OrderRepository.save(order);
+  }
+
+  async pay(orderId: string) {
+    const order = await this.findOne(orderId);
+    order.pay();
+    return await OrderRepository.save(order);
+  }
+
+  async cancel(orderId: string) {
+    const order = await this.findOne(orderId);
+    order.cancel();
+    return await OrderRepository.save(order);
   }
 }

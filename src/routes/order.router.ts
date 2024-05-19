@@ -35,3 +35,43 @@ router.delete("/:id", passport.authenticate("jwt", { session: false }), validate
     next(error);
   }
 });
+
+router.put("/:id/confirm", async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { id } = req.params;
+    const order = await orderService.confirm(id);
+    res.json(order);
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.put("/:id/pay", async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { id } = req.params;
+    const order = await orderService.pay(id);
+    res.json(order);
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.put("/:id/complete", async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { id } = req.params;
+    const order = await orderService.complete(id);
+    res.json(order);
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.put("/:id/cancel", async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { id } = req.params;
+    const order = await orderService.cancel(id);
+    res.json(order);
+  } catch (error) {
+    next(error);
+  }
+});

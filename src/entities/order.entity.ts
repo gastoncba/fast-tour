@@ -3,6 +3,7 @@ import { Entity, PrimaryGeneratedColumn, ManyToOne, Column, OneToMany } from "ty
 import { User } from "./user.entity";
 import { Trip } from "./trip.entity";
 import { PlaceVisited } from "./placeVisited.entity";
+import { OrderState } from "./order-state.entity";
 
 @Entity({ name: "orders" })
 export class Order {
@@ -35,4 +36,23 @@ export class Order {
 
   @Column({ type: "real" })
   total: number;
+
+  @ManyToOne(() => OrderState, { eager: true })
+  state: OrderState
+
+  confirm() {
+    this.state.confirm(this);
+  }
+
+  cancel() {
+    this.state.cancel(this);
+  }
+
+  pay() {
+    this.state.pay(this);
+  }
+
+  complete() {
+    this.state.complete(this);
+  }
 }
