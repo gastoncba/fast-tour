@@ -4,6 +4,7 @@ import bcrypt from "bcrypt";
 import { UserRepository } from "../repositories/repository";
 import { RoleService } from "./role.service";
 import { OrderService } from "./order.service";
+import { UserDTO } from "../dtos/user.dto";
 
 const orderService = new OrderService();
 const roleService = new RoleService();
@@ -12,7 +13,9 @@ export class UserService {
   constructor() {}
 
   async find() {
-    return await UserRepository.find();
+    const users = await UserRepository.find({ relations: ["role"] });
+    const userDTOs = users.map((user) => new UserDTO(user)).filter((user) => user.role.id !== "1");
+    return userDTOs;
   }
 
   async create(data: { firstName: string; lastName: string; email: string; password: string; roleId: string }) {
