@@ -1,7 +1,7 @@
 import * as boom from "@hapi/boom";
 import { FindManyOptions } from "typeorm";
 
-import { ConfirmedOrderState, Hotel, Order, PendingOrderState, Place, PlaceVisited, Trip, User } from "../entities";
+import { Hotel, Order, PendingOrderState, Place, PlaceVisited, Trip, User } from "../entities";
 import { OrderRepository } from "../repositories/repository";
 import { appDataSource } from "../database/database";
 import { TripService } from "./trip.service";
@@ -156,7 +156,7 @@ export class OrderService {
   }
 
   async findOrderByUser(userId: string) {
-    return await OrderRepository.find({ where: { user: { id: userId } }, relations: ["trip", "placesVisited", "placesVisited.hotel", "placesVisited.place"] });
+    return await OrderRepository.find({ where: { user: { id: userId } }, relations: ["trip", "placesVisited", "placesVisited.hotel", "placesVisited.place", "state"] });
   }
 
   async confirm(orderId: string) {
