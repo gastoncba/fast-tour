@@ -2,7 +2,7 @@ import express, { Request, Response, NextFunction } from "express";
 import passport from "passport";
 
 import { UserService } from "../services/user.service";
-import { createUserSchema, updateUserSchema } from "../schemas/user.schema";
+import { createUserSchema, getOrdersByUserSchema, updateUserSchema } from "../schemas/user.schema";
 import { validatorHandler } from "../middleware/validator.handler";
 import { validateUserRole } from "../middleware";
 
@@ -51,7 +51,7 @@ router.put("/update", passport.authenticate("jwt", { session: false }), validato
   }
 });
 
-router.get("/:userId/orders", async (req: Request, res: Response, next: NextFunction) => {
+router.get("/:userId/orders", passport.authenticate("jwt", { session: false }), validatorHandler(getOrdersByUserSchema, "params"), async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { userId } = req.params;
     const orders = await userService.searchOrders(userId);

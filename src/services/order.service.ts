@@ -92,12 +92,7 @@ export class OrderService {
     const options: FindManyOptions<Order> = {};
     options.order = { id: "ASC" };
     options.relations = ["trip", "user", "placesVisited", "placesVisited.hotel", "placesVisited.place", "state"];
-
-    const orders = await OrderRepository.find(options);
-    return orders.map((order) => ({
-      ...order,
-      state: order.state.name,
-    }));
+    return await OrderRepository.find(options);
   }
 
   async findOne(id: string) {
