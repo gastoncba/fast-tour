@@ -7,6 +7,7 @@ import { appDataSource } from "../database/database";
 import { TripService } from "./trip.service";
 import { CountryService } from "./country.service";
 import { PlaceService } from "./place.service";
+import { IService } from "./private/IService";
 
 const tripService = new TripService();
 const countryService = new CountryService();
@@ -34,7 +35,7 @@ export class TripRanking implements RankingStrategy {
   }
 }
 
-export class OrderService {
+export class OrderService implements IService<Order> {
   constructor() {}
 
   async create(data: { purchaseDate: string; userId: number | null; tripId: number; placesVisited: { placeId: number; hotelId: number }[]; numberPeople: number; firstName?: string; lastName?: string; email?: string; total: number }) {
@@ -88,8 +89,16 @@ export class OrderService {
     }
   }
 
-  async find() {
+  async find(query?: Record<string, any>) {
     const options: FindManyOptions<Order> = {};
+    if (query) {
+      const { take, skip } = query;
+      if (take && skip) {
+        options.take = parseInt(take);
+        options.skip = parseInt(skip);
+      }
+    }
+
     options.order = { id: "ASC" };
     options.relations = ["trip", "user", "placesVisited", "placesVisited.hotel", "placesVisited.place", "state"];
     return await OrderRepository.find(options);
@@ -124,6 +133,10 @@ export class OrderService {
     }
   }
 
+  update(id: string, changes: Record<string, any>): Promise<Order> {
+    throw new Error("Method not implemented.");
+  }
+
   async getRankings(strategy: RankingStrategy, limit: number = 10): Promise<any[]> {
     return await strategy.calculateRanking(limit);
   }
@@ -150,8 +163,8 @@ export class OrderService {
     return result;
   }
 
-  async findOrderByUser(userId: string) {
-    return await OrderRepository.find({ where: { user: { id: userId } }, relations: ["trip", "placesVisited", "placesVisited.hotel", "placesVisited.place", "state"] });
+  async findOrderByUser(userId: string, take: number, skip: number) {
+    return await OrderRepository.find({ take, skip, where: { user: { id: userId } }, relations: ["trip", "placesVisited", "placesVisited.hotel", "placesVisited.place", "state"] });
   }
 
   async confirm(orderId: string) {

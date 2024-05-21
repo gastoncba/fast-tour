@@ -1,17 +1,17 @@
-import QueryString from "qs";
 import * as boom from "@hapi/boom";
 import { FindManyOptions, ILike, In } from "typeorm";
 
 import { HotelRepository } from "../repositories/repository";
 import { PlaceService } from "./place.service";
 import { Hotel } from "../entities";
+import { IService } from "./private/IService";
 
 const placeService = new PlaceService();
 
-export class HotelService {
+export class HotelService implements IService<Hotel> {
   constructor() {}
 
-  async find(query: QueryString.ParsedQs) {
+  async find(query: Record<string, any>) {
     const { name, placeId } = query;
     const options: FindManyOptions<Hotel> = {};
     options.order = { id: "ASC" };

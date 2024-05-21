@@ -1,30 +1,30 @@
 import * as boom from "@hapi/boom";
-import QueryString from "qs";
 import { Between, FindManyOptions, ILike, In, LessThanOrEqual, MoreThanOrEqual } from "typeorm";
 
 import { Trip } from "../entities";
 import { TripRepository } from "../repositories/repository";
 import { PlaceService } from "./place.service";
+import { IService } from "./private/IService";
 
 const placeService = new PlaceService();
 
-export class TripService {
+export class TripService implements IService<Trip> {
   constructor() {}
 
-  async find(query: QueryString.ParsedQs) {
+  async find(query: Record<string, any>) {
     const { take, skip, maxPrice, minPrice, start, end, places, name } = query;
     const options: FindManyOptions<Trip> = {};
     options.order = { id: "ASC" };
 
     if (take && skip) {
-      options.take = parseInt(take as string);
-      options.skip = parseInt(skip as string);
+      options.take = parseInt(take);
+      options.skip = parseInt(skip);
     }
 
     if (minPrice && maxPrice) {
       options.where = {
         ...options.where,
-        price: Between(parseFloat(minPrice as string), parseFloat(maxPrice as string)),
+        price: Between(parseFloat(minPrice), parseFloat(maxPrice)),
       };
     }
 

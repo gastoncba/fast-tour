@@ -3,7 +3,7 @@ import passport from "passport";
 
 import { OrderService } from "../services/order.service";
 import { validateUserRole, validatorHandler } from "../middleware";
-import { createOrderSchema, getOrderSchema } from "../schemas/order.schema";
+import { createOrderSchema, getOrderSchema, queryOrderSchema } from "../schemas/order.schema";
 
 export const router = express.Router();
 const orderService = new OrderService();
@@ -17,9 +17,9 @@ router.post("/", validatorHandler(createOrderSchema, "body"), async (req: Reques
   }
 });
 
-router.get("/", passport.authenticate("jwt", { session: false }), validateUserRole(["ADMIN"]), async (req: Request, res: Response, next: NextFunction) => {
+router.get("/", passport.authenticate("jwt", { session: false }), validateUserRole(["ADMIN"]), validatorHandler(queryOrderSchema, "query"), async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const orders = await orderService.find();
+    const orders = await orderService.find(req.query);
     res.status(200).json(orders);
   } catch (error) {
     next(error);

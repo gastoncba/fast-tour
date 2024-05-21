@@ -4,8 +4,8 @@ const id = Joi.number().integer().positive();
 const name = Joi.string().min(3).max(50);
 const code = Joi.string().min(1).max(10);
 
-const take = Joi.number().integer().positive();
-const skip = Joi.number().integer().positive();
+const take = Joi.number().integer().min(0);
+const skip = Joi.number().integer().min(0);
 
 export const createCountrySchema = Joi.object({
   name: name.required(),

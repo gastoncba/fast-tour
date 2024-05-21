@@ -5,13 +5,14 @@ import { FindManyOptions, In, ILike } from "typeorm";
 import { PlaceRepository } from "../repositories/repository";
 import { CountryService } from "./country.service";
 import { Place } from "../entities";
+import { IService } from "./private/IService";
 
 const countryService = new CountryService();
 
-export class PlaceService {
+export class PlaceService implements IService<Place> {
   constructor() {}
 
-  async find(query: QueryString.ParsedQs) {
+  async find(query: Record<string, any>) {
     const { countryId, name } = query;
     const options: FindManyOptions<Place> = {};
     options.order = { id: "ASC" };

@@ -1,9 +1,10 @@
 import * as boom from "@hapi/boom";
 
 import { RoleRepository } from "../repositories/repository";
-import { RoleType } from "../entities/role.entity";
+import { Role, RoleType } from "../entities/role.entity";
+import { IService } from "./private/IService";
 
-export class RoleService {
+export class RoleService implements IService<Role> {
   constructor() {}
 
   async create(data: { name: RoleType }) {
@@ -11,7 +12,7 @@ export class RoleService {
     return await RoleRepository.save(role);
   }
 
-  async findById(id: string) {
+  async findOne(id: string) {
     const role = await RoleRepository.findOneBy({ id });
     if (!role) {
       throw boom.notFound(`role #${id} not found`);
@@ -21,6 +22,13 @@ export class RoleService {
   }
 
   async find() {
-    return await RoleRepository.find()
+    return await RoleRepository.find();
+  }
+
+  update(id: string, changes: Record<string, any>): Promise<Role> {
+    throw new Error("Method not implemented.");
+  }
+  remove(id: string): Promise<void> | Promise<any> {
+    throw new Error("Method not implemented.");
   }
 }

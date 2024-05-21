@@ -20,7 +20,7 @@ export class UserService {
 
   async create(data: { firstName: string; lastName: string; email: string; password: string; roleId: string }) {
     const { roleId, ...newData } = data;
-    const role = await roleService.findById(roleId);
+    const role = await roleService.findOne(roleId);
 
     const foundUser = await this.findByEmail(data.email);
 
@@ -80,8 +80,8 @@ export class UserService {
     return await UserRepository.save(user);
   }
 
-  async searchOrders(userId: string) {
+  async searchOrders(userId: string, query?: Record<string, any>) {
     await this.findUserComplete(userId);
-    return await orderService.findOrderByUser(userId);
+    return await orderService.findOrderByUser(userId, query ? query.take : 5, query ? query.skip : 0);
   }
 }

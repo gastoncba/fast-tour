@@ -17,6 +17,9 @@ const email = Joi.string();
 const total = Joi.number().positive();
 const id = Joi.number().integer().positive();
 
+const take = Joi.number().integer().min(0);
+const skip = Joi.number().integer().min(0);
+
 export const createOrderSchema = Joi.object({
   purchaseDate: purchaseDate.required(),
   userId,
@@ -31,4 +34,9 @@ export const createOrderSchema = Joi.object({
 
 export const getOrderSchema = Joi.object({
   id: id.required(),
+});
+
+export const queryOrderSchema = Joi.object({
+  take,
+  skip,
 });

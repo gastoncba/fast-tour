@@ -12,8 +12,8 @@ const placesId = Joi.array().items(Joi.number().integer().positive());
 
 const maxPrice = Joi.number().positive();
 const minPrice = Joi.number().positive().min(0);
-const take = Joi.number().integer().positive();
-const skip = Joi.number().integer().positive();
+const take = Joi.number().integer().min(0);
+const skip = Joi.number().integer().min(0);
 const start = Joi.extend(JoiDate).date().format("YYYY-MM-DD");
 const end = Joi.extend(JoiDate).date().format("YYYY-MM-DD");
 const places = Joi.string();

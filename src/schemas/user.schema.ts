@@ -7,6 +7,9 @@ const password = Joi.string();
 const roleId = Joi.number().positive().integer();
 const userId = Joi.number().positive().integer();
 
+const take = Joi.number().integer().min(0);
+const skip = Joi.number().integer().min(0);
+
 export const createUserSchema = Joi.object({
   firstName: firstName.required(),
   lastName: lastName.required(),
@@ -23,4 +26,9 @@ export const updateUserSchema = Joi.object({
 
 export const getOrdersByUserSchema = Joi.object({
   userId,
+});
+
+export const queryUserSchema = Joi.object({
+  take,
+  skip,
 });
