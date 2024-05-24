@@ -8,10 +8,12 @@ import { TripService } from "./trip.service";
 import { CountryService } from "./country.service";
 import { PlaceService } from "./place.service";
 import { IService } from "./private/IService";
+import { EmailService } from "./email.service";
 
 const tripService = new TripService();
 const countryService = new CountryService();
 const placeService = new PlaceService();
+const emailService = new EmailService();
 
 interface RankingStrategy {
   calculateRanking(limit: number): Promise<any[]>;
@@ -77,8 +79,8 @@ export class OrderService implements IService<Order> {
 
       const order = queryRunner.manager.create(Order, { ...newData, placesVisited: visiteds, trip, user });
       order.state = new PendingOrderState();
+      emailService.notifyChangeOfStatus(order, "Orden de viaje - registrada", "¡Registramos tu Pedido de Viaje!", "Pendiente", "Confirmada");
       const newOrder = await queryRunner.manager.save(order);
-
       await queryRunner.commitTransaction();
       return newOrder;
     } catch (error) {
@@ -105,7 +107,7 @@ export class OrderService implements IService<Order> {
   }
 
   async findOne(id: string) {
-    const order = await OrderRepository.findOne({ where: { id }, relations: ["placesVisited"] });
+    const order = await OrderRepository.findOne({ where: { id }, relations: ["placesVisited", "trip", "user", "placesVisited.hotel", "placesVisited.place"] });
 
     if (!order) {
       throw boom.notFound(`order #${id} not found`);
@@ -169,25 +171,25 @@ export class OrderService implements IService<Order> {
 
   async confirm(orderId: string) {
     const order = await this.findOne(orderId);
-    order.confirm();
+    order.confirm(emailService);
     return await OrderRepository.save(order);
   }
 
   async complete(orderId: string) {
     const order = await this.findOne(orderId);
-    order.complete();
+    order.complete(emailService);
     return await OrderRepository.save(order);
   }
 
   async pay(orderId: string) {
     const order = await this.findOne(orderId);
-    order.pay();
+    order.pay(emailService);
     return await OrderRepository.save(order);
   }
 
   async cancel(orderId: string) {
     const order = await this.findOne(orderId);
-    order.cancel();
+    order.cancel(emailService);
     return await OrderRepository.save(order);
   }
 }

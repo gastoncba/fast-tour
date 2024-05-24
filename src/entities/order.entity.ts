@@ -4,6 +4,7 @@ import { User } from "./user.entity";
 import { Trip } from "./trip.entity";
 import { PlaceVisited } from "./placeVisited.entity";
 import { OrderState } from "./order-state.entity";
+import { EmailService } from "../services/email.service";
 
 @Entity({ name: "orders" })
 export class Order {
@@ -40,19 +41,19 @@ export class Order {
   @ManyToOne(() => OrderState, { eager: true })
   state: OrderState
 
-  confirm() {
-    this.state.confirm(this);
+  confirm(emailService: EmailService) {
+    this.state.confirm(this, emailService);
   }
 
-  cancel() {
-    this.state.cancel(this);
+  cancel(emailService: EmailService) {
+    this.state.cancel(this, emailService);
   }
 
-  pay() {
-    this.state.pay(this);
+  pay(emailService: EmailService) {
+    this.state.pay(this, emailService);
   }
 
-  complete() {
-    this.state.complete(this);
+  complete(emailService: EmailService) {
+    this.state.complete(this, emailService);
   }
 }
