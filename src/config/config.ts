@@ -9,7 +9,9 @@ export const config = {
   dbPassword: process.env.DB_PASSWORD,
   dbHost: process.env.DB_HOST,
   dbName: process.env.DB_NAME,
-    //@ts-ignore
-    dbPort: parseInt(process.env.DB_PORT, 10),
+  //@ts-ignore
+  dbPort: parseInt(process.env.DB_PORT, 10),
   jwtSecret: process.env.JWT_SECRET || "",
+  smtpUser: process.env.SMTP_USER || "",
+  smtpPass: process.env.SMTP_PASS || "",
 };
