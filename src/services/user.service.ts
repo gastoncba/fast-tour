@@ -5,6 +5,8 @@ import { UserRepository } from "../repositories/repository";
 import { RoleService } from "./role.service";
 import { OrderService } from "./order.service";
 import { UserDTO } from "../dtos/user.dto";
+import { FindManyOptions } from "typeorm";
+import { User } from "../entities";
 
 const orderService = new OrderService();
 const roleService = new RoleService();
@@ -12,8 +14,18 @@ const roleService = new RoleService();
 export class UserService {
   constructor() {}
 
-  async find() {
-    const users = await UserRepository.find({ relations: ["role"] });
+  async find(query?: Record<string, any>) {
+    const options: FindManyOptions<User> = {};
+
+    if (query) {
+      const { take, skip } = query;
+      if (take && skip) {
+        options.take = parseInt(take);
+        options.skip = parseInt(skip);
+      }
+    }
+
+    const users = await UserRepository.find({ ...options, relations: ["role"] });
     const userDTOs = users.map((user) => new UserDTO(user)).filter((user) => user.role.id !== "1");
     return userDTOs;
   }

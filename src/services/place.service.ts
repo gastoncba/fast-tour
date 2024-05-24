@@ -13,7 +13,7 @@ export class PlaceService implements IService<Place> {
   constructor() {}
 
   async find(query: Record<string, any>) {
-    const { countryId, name } = query;
+    const { countryId, name, take, skip } = query;
     const options: FindManyOptions<Place> = {};
     options.order = { id: "ASC" };
     options.relations = ["country", "hotels"];
@@ -28,6 +28,12 @@ export class PlaceService implements IService<Place> {
         name: ILike(`%${name}%`),
       };
     }
+
+    if (take && skip) {
+      options.take = parseInt(take);
+      options.skip = parseInt(skip);
+    }
+
     const place = await PlaceRepository.find(options);
     return place;
   }

@@ -12,7 +12,7 @@ export class HotelService implements IService<Hotel> {
   constructor() {}
 
   async find(query: Record<string, any>) {
-    const { name, placeId } = query;
+    const { name, placeId, take, skip } = query;
     const options: FindManyOptions<Hotel> = {};
     options.order = { id: "ASC" };
 
@@ -28,6 +28,11 @@ export class HotelService implements IService<Hotel> {
         ...options.where,
         place: In([placeId]),
       };
+    }
+
+    if (take && skip) {
+      options.take = parseInt(take);
+      options.skip = parseInt(skip);
     }
 
     const hotels = await HotelRepository.find(options);

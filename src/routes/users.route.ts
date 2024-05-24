@@ -11,7 +11,7 @@ const userService = new UserService();
 
 router.get("/all", passport.authenticate("jwt", { session: false }), validateUserRole(["ADMIN"]), validatorHandler(queryUserSchema, "query"), async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const users = await userService.find();
+    const users = await userService.find(req.query);
     res.json(users);
   } catch (error) {
     next(error);
