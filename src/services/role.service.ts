@@ -12,7 +12,7 @@ export class RoleService implements IService<Role> {
     return await RoleRepository.save(role);
   }
 
-  async findOne(id: string) {
+  async findOne(id: string, relations?: string[]) {
     const role = await RoleRepository.findOneBy({ id });
     if (!role) {
       throw boom.notFound(`role #${id} not found`);
@@ -21,7 +21,7 @@ export class RoleService implements IService<Role> {
     return role;
   }
 
-  async find() {
+  async find(query?: Record<string, any>, relations?: string[]) {
     return await RoleRepository.find();
   }
 

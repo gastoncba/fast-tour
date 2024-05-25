@@ -7,10 +7,11 @@ import { CountryRepository } from "../repositories/repository";
 export class CountryService {
   constructor() {}
 
-  async find(query: Record<string, any>) {
+  async find(query: Record<string, any>, relations?: string[]) {
     const { take, skip, name } = query;
     const options: FindManyOptions<Country> = {};
     options.order = { id: "ASC" };
+    options.relations = relations
 
     if (take && skip) {
       options.take = parseInt(take as string);

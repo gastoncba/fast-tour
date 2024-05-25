@@ -91,7 +91,7 @@ export class OrderService implements IService<Order> {
     }
   }
 
-  async find(query?: Record<string, any>) {
+  async find(query?: Record<string, any>, relations?: string[]) {
     const options: FindManyOptions<Order> = {};
     if (query) {
       const { take, skip } = query;
@@ -102,12 +102,15 @@ export class OrderService implements IService<Order> {
     }
 
     options.order = { id: "ASC" };
-    options.relations = ["trip", "user", "placesVisited", "placesVisited.hotel", "placesVisited.place", "state"];
+    options.relations = relations ? [...relations, "trip", "user", "placesVisited", "placesVisited.hotel", "placesVisited.place", "state"] : ["trip", "user", "placesVisited", "placesVisited.hotel", "placesVisited.place", "state"];
     return await OrderRepository.find(options);
   }
 
-  async findOne(id: string) {
-    const order = await OrderRepository.findOne({ where: { id }, relations: ["placesVisited", "trip", "user", "placesVisited.hotel", "placesVisited.place"] });
+  async findOne(id: string, relations?: string[]) {
+    const order = await OrderRepository.findOne({
+      where: { id },
+      relations: relations ? [...relations, "placesVisited"] : ["placesVisited"],
+    });
 
     if (!order) {
       throw boom.notFound(`order #${id} not found`);
@@ -170,25 +173,25 @@ export class OrderService implements IService<Order> {
   }
 
   async confirm(orderId: string) {
-    const order = await this.findOne(orderId);
+    const order = await this.findOne(orderId, ["trip", "user", "placesVisited.hotel", "placesVisited.place", "state"]);
     order.confirm(emailService);
     return await OrderRepository.save(order);
   }
 
   async complete(orderId: string) {
-    const order = await this.findOne(orderId);
+    const order = await this.findOne(orderId, ["trip", "user", "placesVisited.hotel", "placesVisited.place", "state"]);
     order.complete(emailService);
     return await OrderRepository.save(order);
   }
 
   async pay(orderId: string) {
-    const order = await this.findOne(orderId);
+    const order = await this.findOne(orderId, ["trip", "user", "placesVisited.hotel", "placesVisited.place", "state"]);
     order.pay(emailService);
     return await OrderRepository.save(order);
   }
 
   async cancel(orderId: string) {
-    const order = await this.findOne(orderId);
+    const order = await this.findOne(orderId, ["trip", "user", "placesVisited.hotel", "placesVisited.place", "state"]);
     order.cancel(emailService);
     return await OrderRepository.save(order);
   }

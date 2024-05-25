@@ -11,10 +11,11 @@ const placeService = new PlaceService();
 export class HotelService implements IService<Hotel> {
   constructor() {}
 
-  async find(query: Record<string, any>) {
+  async find(query: Record<string, any>, relations?: string[]) {
     const { name, placeId, take, skip } = query;
     const options: FindManyOptions<Hotel> = {};
     options.order = { id: "ASC" };
+    options.relations = relations;
 
     if (name) {
       options.where = {
@@ -39,8 +40,8 @@ export class HotelService implements IService<Hotel> {
     return hotels;
   }
 
-  async findOne(id: string) {
-    const hotel = await HotelRepository.findOne({ relations: ["place", "place.country"], where: { id } });
+  async findOne(id: string, relations?: string[]) {
+    const hotel = await HotelRepository.findOne({ relations: relations ? [...relations, "place", "place.country"] : ["place", "place.country"], where: { id } });
     if (!hotel) {
       throw boom.notFound(`hotel #${id} not found`);
     }

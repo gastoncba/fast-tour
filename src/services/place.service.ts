@@ -12,11 +12,11 @@ const countryService = new CountryService();
 export class PlaceService implements IService<Place> {
   constructor() {}
 
-  async find(query: Record<string, any>) {
+  async find(query: Record<string, any>, relations?: string[]) {
     const { countryId, name, take, skip } = query;
     const options: FindManyOptions<Place> = {};
     options.order = { id: "ASC" };
-    options.relations = ["country", "hotels"];
+    options.relations = relations ? [...relations, "country", "hotels"] : ["country", "hotels"];
 
     if (countryId) {
       options.where = { country: { id: In([countryId]) } };
@@ -38,8 +38,8 @@ export class PlaceService implements IService<Place> {
     return place;
   }
 
-  async findOne(id: string) {
-    const place = await PlaceRepository.findOne({ relations: ["country"], where: { id } });
+  async findOne(id: string, relations?: string[]) {
+    const place = await PlaceRepository.findOne({ relations: relations ? [...relations, "country"] : ["country"], where: { id } });
     if (!place) {
       throw boom.notFound(`place #${id} not found`);
     }

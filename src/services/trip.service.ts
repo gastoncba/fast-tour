@@ -11,7 +11,7 @@ const placeService = new PlaceService();
 export class TripService implements IService<Trip> {
   constructor() {}
 
-  async find(query: Record<string, any>) {
+  async find(query: Record<string, any>, relations?: string[]) {
     const { take, skip, maxPrice, minPrice, start, end, places, name } = query;
     const options: FindManyOptions<Trip> = {};
     options.order = { id: "ASC" };
@@ -44,7 +44,7 @@ export class TripService implements IService<Trip> {
       const placesQuery = places as string;
       const placesIds = placesQuery.split(",").map((q) => parseInt(q));
 
-      options.relations = ["places"];
+      options.relations = relations ? [...relations, "places"] : ["places"];
 
       options.where = {
         ...options.where,
@@ -65,9 +65,9 @@ export class TripService implements IService<Trip> {
     return travel;
   }
 
-  async findOne(id: string) {
+  async findOne(id: string, relations?: string[]) {
     const trip = await TripRepository.findOne({
-      relations: ["places", "places.country"],
+      relations: relations ? [...relations, "places", "places.country"] : ["places", "places.country"],
       where: { id },
     });
     if (!trip) {

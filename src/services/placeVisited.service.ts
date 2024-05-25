@@ -9,10 +9,10 @@ const hotelService = new HotelService();
 
 export class PlaceVisitedService implements IService<PlaceVisited> {
   constructor() {}
-  find(query: Record<string, any> | undefined): Promise<PlaceVisited[]> {
+  find(query?: Record<string, any> | undefined, relations?: string[] | undefined): Promise<PlaceVisited[]> {
     throw new Error("Method not implemented.");
   }
-  findOne(id: string): Promise<PlaceVisited> {
+  findOne(id: string, relations?: string[] | undefined): Promise<PlaceVisited> {
     throw new Error("Method not implemented.");
   }
   update(id: string, changes: Record<string, any>): Promise<PlaceVisited> {
@@ -21,6 +21,7 @@ export class PlaceVisitedService implements IService<PlaceVisited> {
   remove(id: string): Promise<void> | Promise<any> {
     throw new Error("Method not implemented.");
   }
+
 
   async create(placesVisited: { placeId: number; hotelId: number }) {
     const { placeId, hotelId } = placesVisited;
