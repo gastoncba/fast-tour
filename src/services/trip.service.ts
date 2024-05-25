@@ -1,30 +1,30 @@
 import * as boom from "@hapi/boom";
-import QueryString from "qs";
 import { Between, FindManyOptions, ILike, In, LessThanOrEqual, MoreThanOrEqual } from "typeorm";
 
 import { Trip } from "../entities";
 import { TripRepository } from "../repositories/repository";
 import { PlaceService } from "./place.service";
+import { IService } from "./private/IService";
 
 const placeService = new PlaceService();
 
-export class TripService {
+export class TripService implements IService<Trip> {
   constructor() {}
 
-  async find(query: QueryString.ParsedQs) {
+  async find(query: Record<string, any>, relations?: string[]) {
     const { take, skip, maxPrice, minPrice, start, end, places, name } = query;
     const options: FindManyOptions<Trip> = {};
     options.order = { id: "ASC" };
 
     if (take && skip) {
-      options.take = parseInt(take as string);
-      options.skip = parseInt(skip as string);
+      options.take = parseInt(take);
+      options.skip = parseInt(skip);
     }
 
     if (minPrice && maxPrice) {
       options.where = {
         ...options.where,
-        price: Between(parseFloat(minPrice as string), parseFloat(maxPrice as string)),
+        price: Between(parseFloat(minPrice), parseFloat(maxPrice)),
       };
     }
 
@@ -44,7 +44,7 @@ export class TripService {
       const placesQuery = places as string;
       const placesIds = placesQuery.split(",").map((q) => parseInt(q));
 
-      options.relations = ["places"];
+      options.relations = relations ? [...relations, "places"] : ["places"];
 
       options.where = {
         ...options.where,
@@ -65,9 +65,9 @@ export class TripService {
     return travel;
   }
 
-  async findOne(id: string) {
+  async findOne(id: string, relations?: string[]) {
     const trip = await TripRepository.findOne({
-      relations: ["places", "places.country"],
+      relations: relations ? [...relations, "places", "places.country"] : ["places", "places.country"],
       where: { id },
     });
     if (!trip) {
@@ -117,5 +117,17 @@ export class TripService {
     }
 
     return await TripRepository.delete(id);
+  }
+
+  async getTop(limit: number) {
+    const tripTop = await TripRepository.createQueryBuilder("trip")
+      .select("trip.*")
+      .addSelect('COUNT("o"."tripId")', "sales_total")
+      .innerJoin("orders", "o", "o.tripId = trip.id")
+      .groupBy("trip.id")
+      .orderBy("sales_total", "DESC")
+      .limit(limit)
+      .getRawMany();
+    return tripTop;
   }
 }

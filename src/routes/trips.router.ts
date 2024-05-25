@@ -10,6 +10,7 @@ const tripService = new TripService();
 
 router.get("/", validatorHandler(queryTripSchema, "query"), async (req: Request, res: Response, next: NextFunction) => {
   try {
+    console.log(req.query)
     const trips = await tripService.find(req.query);
     res.json(trips);
   } catch (error) {

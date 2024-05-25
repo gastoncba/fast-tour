@@ -1,20 +1,21 @@
-import QueryString from "qs";
 import * as boom from "@hapi/boom";
 import { FindManyOptions, ILike, In } from "typeorm";
 
 import { HotelRepository } from "../repositories/repository";
 import { PlaceService } from "./place.service";
 import { Hotel } from "../entities";
+import { IService } from "./private/IService";
 
 const placeService = new PlaceService();
 
-export class HotelService {
+export class HotelService implements IService<Hotel> {
   constructor() {}
 
-  async find(query: QueryString.ParsedQs) {
-    const { name, placeId } = query;
+  async find(query: Record<string, any>, relations?: string[]) {
+    const { name, placeId, take, skip } = query;
     const options: FindManyOptions<Hotel> = {};
     options.order = { id: "ASC" };
+    options.relations = relations;
 
     if (name) {
       options.where = {
@@ -30,12 +31,17 @@ export class HotelService {
       };
     }
 
+    if (take && skip) {
+      options.take = parseInt(take);
+      options.skip = parseInt(skip);
+    }
+
     const hotels = await HotelRepository.find(options);
     return hotels;
   }
 
-  async findOne(id: string) {
-    const hotel = await HotelRepository.findOne({ relations: ["place", "place.country"], where: { id } });
+  async findOne(id: string, relations?: string[]) {
+    const hotel = await HotelRepository.findOne({ relations: relations ? [...relations, "place", "place.country"] : ["place", "place.country"], where: { id } });
     if (!hotel) {
       throw boom.notFound(`hotel #${id} not found`);
     }

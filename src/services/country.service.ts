@@ -1,5 +1,4 @@
 import * as boom from "@hapi/boom";
-import QueryString from "qs";
 import { FindManyOptions, ILike } from "typeorm";
 
 import { Country } from "../entities";
@@ -8,10 +7,11 @@ import { CountryRepository } from "../repositories/repository";
 export class CountryService {
   constructor() {}
 
-  async find(query: QueryString.ParsedQs) {
+  async find(query: Record<string, any>, relations?: string[]) {
     const { take, skip, name } = query;
     const options: FindManyOptions<Country> = {};
-    options.order = { id: "ASC" }
+    options.order = { id: "ASC" };
+    options.relations = relations
 
     if (take && skip) {
       options.take = parseInt(take as string);
@@ -39,12 +39,12 @@ export class CountryService {
     return country;
   }
 
-  async create(data: { name: string, code: string }) {
+  async create(data: { name: string; code: string }) {
     const country = CountryRepository.create(data);
     return await CountryRepository.save(country);
   }
 
-  async update(id: string, changes: { name?: string, code?: string }) {
+  async update(id: string, changes: { name?: string; code?: string }) {
     const country = await CountryRepository.findOneBy({ id });
 
     if (!country) {
@@ -62,5 +62,20 @@ export class CountryService {
     }
 
     return await CountryRepository.delete(id);
+  }
+
+  async getTop(limit: number) {
+    const countryTop = await CountryRepository.createQueryBuilder("trip")
+      .select("c.*")
+      .addSelect('COUNT("o"."tripId")', "sales_total")
+      .innerJoin("orders", "o", "o.tripId = trip.id")
+      .innerJoin("trip_places_place", "tpp", "tpp.tripId = trip.id")
+      .innerJoin("place", "p", "tpp.placeId = p.id")
+      .innerJoin("country", "c", "c.id = p.countryId")
+      .groupBy("c.id")
+      .orderBy("sales_total", "DESC")
+      .limit(limit)
+      .getRawMany();
+    return countryTop;
   }
 }

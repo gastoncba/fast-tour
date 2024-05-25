@@ -5,17 +5,18 @@ import { FindManyOptions, In, ILike } from "typeorm";
 import { PlaceRepository } from "../repositories/repository";
 import { CountryService } from "./country.service";
 import { Place } from "../entities";
+import { IService } from "./private/IService";
 
 const countryService = new CountryService();
 
-export class PlaceService {
+export class PlaceService implements IService<Place> {
   constructor() {}
 
-  async find(query: QueryString.ParsedQs) {
-    const { countryId, name } = query;
+  async find(query: Record<string, any>, relations?: string[]) {
+    const { countryId, name, take, skip } = query;
     const options: FindManyOptions<Place> = {};
-    options.order = { id: "ASC" }
-    options.relations = ["country", "hotels"];
+    options.order = { id: "ASC" };
+    options.relations = relations ? [...relations, "country", "hotels"] : ["country", "hotels"];
 
     if (countryId) {
       options.where = { country: { id: In([countryId]) } };
@@ -27,12 +28,18 @@ export class PlaceService {
         name: ILike(`%${name}%`),
       };
     }
+
+    if (take && skip) {
+      options.take = parseInt(take);
+      options.skip = parseInt(skip);
+    }
+
     const place = await PlaceRepository.find(options);
     return place;
   }
 
-  async findOne(id: string) {
-    const place = await PlaceRepository.findOne({ relations: ["country"], where: { id } });
+  async findOne(id: string, relations?: string[]) {
+    const place = await PlaceRepository.findOne({ relations: relations ? [...relations, "country"] : ["country"], where: { id } });
     if (!place) {
       throw boom.notFound(`place #${id} not found`);
     }
@@ -82,5 +89,19 @@ export class PlaceService {
     }
 
     return await PlaceRepository.delete(id);
+  }
+
+  async getTop(limit: number) {
+    const placeTop = await PlaceRepository.createQueryBuilder("trip")
+      .select("p.*")
+      .addSelect('COUNT("o"."tripId")', "sales_total")
+      .innerJoin("orders", "o", "o.tripId = trip.id")
+      .innerJoin("trip_places_place", "tpp", "tpp.tripId = trip.id")
+      .innerJoin("place", "p", "tpp.placeId = p.id")
+      .groupBy("p.id")
+      .orderBy("sales_total", "DESC")
+      .limit(limit)
+      .getRawMany();
+    return placeTop;
   }
 }

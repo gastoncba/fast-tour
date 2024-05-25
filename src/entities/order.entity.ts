@@ -3,8 +3,10 @@ import { Entity, PrimaryGeneratedColumn, ManyToOne, Column, OneToMany } from "ty
 import { User } from "./user.entity";
 import { Trip } from "./trip.entity";
 import { PlaceVisited } from "./placeVisited.entity";
+import { OrderState } from "./order-state.entity";
+import { EmailService } from "../services/email.service";
 
-@Entity()
+@Entity({ name: "orders" })
 export class Order {
   @PrimaryGeneratedColumn()
   id: string;
@@ -32,4 +34,26 @@ export class Order {
 
   @Column({ type: "varchar", length: 255, nullable: true })
   email: string;
+
+  @Column({ type: "real" })
+  total: number;
+
+  @ManyToOne(() => OrderState, { eager: true })
+  state: OrderState
+
+  confirm(emailService: EmailService) {
+    this.state.confirm(this, emailService);
+  }
+
+  cancel(emailService: EmailService) {
+    this.state.cancel(this, emailService);
+  }
+
+  pay(emailService: EmailService) {
+    this.state.pay(this, emailService);
+  }
+
+  complete(emailService: EmailService) {
+    this.state.complete(this, emailService);
+  }
 }
