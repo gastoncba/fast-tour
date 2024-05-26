@@ -11,29 +11,32 @@ const placeService = new PlaceService();
 export class HotelService implements IService<Hotel> {
   constructor() {}
 
-  async find(query: Record<string, any>, relations?: string[]) {
-    const { name, placeId, take, skip } = query;
+  async find(query?: Record<string, any>, relations?: string[]) {
     const options: FindManyOptions<Hotel> = {};
     options.order = { id: "ASC" };
     options.relations = relations;
+    options.where = { enabled: true };
 
-    if (name) {
-      options.where = {
-        ...options.where,
-        name: ILike(`%${name}%`),
-      };
-    }
+    if (query) {
+      const { name, placeId, take, skip } = query;
+      if (name) {
+        options.where = {
+          ...options.where,
+          name: ILike(`%${name}%`),
+        };
+      }
 
-    if (placeId) {
-      options.where = {
-        ...options.where,
-        place: In([placeId]),
-      };
-    }
+      if (placeId) {
+        options.where = {
+          ...options.where,
+          place: In([placeId]),
+        };
+      }
 
-    if (take && skip) {
-      options.take = parseInt(take);
-      options.skip = parseInt(skip);
+      if (take && skip) {
+        options.take = parseInt(take);
+        options.skip = parseInt(skip);
+      }
     }
 
     const hotels = await HotelRepository.find(options);
@@ -41,7 +44,7 @@ export class HotelService implements IService<Hotel> {
   }
 
   async findOne(id: string, relations?: string[]) {
-    const hotel = await HotelRepository.findOne({ relations: relations ? [...relations, "place", "place.country"] : ["place", "place.country"], where: { id } });
+    const hotel = await HotelRepository.findOne({ relations: relations ? [...relations, "place", "place.country"] : ["place", "place.country"], where: { id, enabled: true } });
     if (!hotel) {
       throw boom.notFound(`hotel #${id} not found`);
     }
@@ -58,11 +61,7 @@ export class HotelService implements IService<Hotel> {
   }
 
   async update(id: string, changes: { name?: string; stars?: number; description?: string; placeId?: string }) {
-    const hotel = await HotelRepository.findOneBy({ id });
-
-    if (!hotel) {
-      throw boom.notFound(`hotel #${id} not found`);
-    }
+    const hotel = await this.findOne(id);
 
     if (changes.placeId) {
       const place = await placeService.findOne(changes.placeId);
@@ -74,12 +73,8 @@ export class HotelService implements IService<Hotel> {
   }
 
   async remove(id: string) {
-    const hotel = await HotelRepository.findOneBy({ id });
-
-    if (!hotel) {
-      throw boom.notFound(`hotel #${id} not found`);
-    }
-
-    return await HotelRepository.delete(id);
+    const hotel = await this.findOne(id);
+    hotel.enabled = false;
+    await HotelRepository.save(hotel);
   }
 }

@@ -1,5 +1,4 @@
 import * as boom from "@hapi/boom";
-import QueryString from "qs";
 import { FindManyOptions, In, ILike } from "typeorm";
 
 import { PlaceRepository } from "../repositories/repository";
@@ -12,26 +11,30 @@ const countryService = new CountryService();
 export class PlaceService implements IService<Place> {
   constructor() {}
 
-  async find(query: Record<string, any>, relations?: string[]) {
-    const { countryId, name, take, skip } = query;
+  async find(query?: Record<string, any>, relations?: string[]) {
     const options: FindManyOptions<Place> = {};
     options.order = { id: "ASC" };
     options.relations = relations ? [...relations, "country", "hotels"] : ["country", "hotels"];
+    options.where = { enabled: true };
 
-    if (countryId) {
-      options.where = { country: { id: In([countryId]) } };
-    }
+    if(query) {
+      const { countryId, name, take, skip } = query;
+      if (countryId) {
+        options.where = { ...options.where, country: { id: In([countryId]) } };
+      }
 
-    if (name) {
-      options.where = {
-        ...options.where,
-        name: ILike(`%${name}%`),
-      };
-    }
+      if (name) {
+        options.where = {
+          ...options.where,
+          name: ILike(`%${name}%`),
+        };
+      }
 
-    if (take && skip) {
-      options.take = parseInt(take);
-      options.skip = parseInt(skip);
+      if (take && skip) {
+        options.take = parseInt(take);
+        options.skip = parseInt(skip);
+      }
+
     }
 
     const place = await PlaceRepository.find(options);
@@ -39,7 +42,7 @@ export class PlaceService implements IService<Place> {
   }
 
   async findOne(id: string, relations?: string[]) {
-    const place = await PlaceRepository.findOne({ relations: relations ? [...relations, "country"] : ["country"], where: { id } });
+    const place = await PlaceRepository.findOne({ relations: relations ? [...relations, "country"] : ["country"], where: { id, enabled: true } });
     if (!place) {
       throw boom.notFound(`place #${id} not found`);
     }
@@ -66,11 +69,7 @@ export class PlaceService implements IService<Place> {
   }
 
   async update(id: string, changes: { name?: string; description?: string; img?: string; countryId?: string }) {
-    const place = await PlaceRepository.findOneBy({ id });
-
-    if (!place) {
-      throw boom.notFound(`place #${id} not found`);
-    }
+    const place = await this.findOne(id);
 
     if (changes.countryId) {
       const country = await countryService.findOne(changes.countryId);
@@ -82,13 +81,9 @@ export class PlaceService implements IService<Place> {
   }
 
   async remove(id: string) {
-    const place = await PlaceRepository.findOneBy({ id });
-
-    if (!place) {
-      throw boom.notFound(`place #${id} not found`);
-    }
-
-    return await PlaceRepository.delete(id);
+    const place = await this.findOne(id);
+    place.enabled = false;
+    await PlaceRepository.save(place);
   }
 
   async getTop(limit: number) {

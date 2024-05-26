@@ -7,15 +7,20 @@ import { OrderService } from "./order.service";
 import { UserDTO } from "../dtos/user.dto";
 import { FindManyOptions } from "typeorm";
 import { User } from "../entities";
+import { IService } from "./private/IService";
+import { EmailService } from "./email.service";
+import { RoleType } from "../entities/role.entity";
 
 const orderService = new OrderService();
 const roleService = new RoleService();
+const emailService = new EmailService();
 
-export class UserService {
+export class UserService implements IService<UserDTO> {
   constructor() {}
 
-  async find(query?: Record<string, any>) {
+  async find(query?: Record<string, any>, relations?: []) {
     const options: FindManyOptions<User> = {};
+    options.where = { enabled: true };
 
     if (query) {
       const { take, skip } = query;
@@ -26,7 +31,7 @@ export class UserService {
     }
 
     const users = await UserRepository.find({ ...options, relations: ["role"] });
-    const userDTOs = users.map((user) => new UserDTO(user)).filter((user) => user.role.id !== "1");
+    const userDTOs = users.map((user) => new UserDTO(user)).filter((user) => user.role.name !== RoleType.ADMIN);
     return userDTOs;
   }
 
@@ -48,22 +53,21 @@ export class UserService {
   }
 
   async findByEmail(email: string) {
-    return await UserRepository.findOne({ where: { email }, relations: ["role"] });
+    return await UserRepository.findOne({ where: { email, enabled: true }, relations: ["role"] });
   }
 
-  async findById(userId: string) {
-    const user = await UserRepository.findOne({ where: { id: userId }, relations: ["role"] });
+  async findOne(id: string, relations?: string[]) {
+    const user = await UserRepository.findOne({ where: { id, enabled: true }, relations: relations ? [...relations, "role"] : ["role"] });
 
     if (!user) {
-      throw boom.notFound(`user #${userId} not found`);
+      throw boom.notFound(`user #${id} not found`);
     }
-
-    const { recoveryToken, password, ...userReturned } = user;
-    return userReturned;
+    const userDto = new UserDTO(user);
+    return userDto;
   }
 
   async findUserComplete(userId: string) {
-    const user = await UserRepository.findOneBy({ id: userId });
+    const user = await UserRepository.findOne({ where: { id: userId, enabled: true } });
 
     if (!user) {
       throw boom.notFound(`user #${userId} not found`);
@@ -80,7 +84,7 @@ export class UserService {
 
     UserRepository.merge(user, changes);
     await UserRepository.save(user);
-    return await this.findById(id);
+    return await this.findOne(id);
   }
 
   async updatePassword(id: string, password: string) {
@@ -95,5 +99,19 @@ export class UserService {
   async searchOrders(userId: string, query?: Record<string, any>) {
     await this.findUserComplete(userId);
     return await orderService.findOrderByUser(userId, query ? query.take : 5, query ? query.skip : 0);
+  }
+
+  async remove(id: string) {
+    const user = await UserRepository.findOne({ where: { id, enabled: true } });
+    if (!user) {
+      throw boom.notFound(`user #${id} not found`);
+    }
+    user.enabled = false;
+    await UserRepository.save(user);
+  }
+
+  async sendMessage(userId: string, message: string) {
+    const user = await this.findOne(userId);
+    await emailService.sendToUser(message, user.firstName, user.lastName, user.email);
   }
 }

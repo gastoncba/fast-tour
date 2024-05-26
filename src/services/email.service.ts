@@ -3,8 +3,8 @@ import nodemailer from "nodemailer";
 import { config } from "../config/config";
 import { Order } from "../entities";
 
-type state = "Pendiente" | "Confirmada" | "Pagada" | "Completada" | "Cancelada"
-type next = "Confirmada" | "Pagada" | "Completada"
+type state = "Pendiente" | "Confirmada" | "Pagada" | "Completada" | "Cancelada";
+type next = "Confirmada" | "Pagada" | "Completada";
 
 export class EmailService {
   constructor() {}
@@ -64,5 +64,14 @@ export class EmailService {
         resolve();
       }
     });
+  }
+  async sendToUser(message: string, firstName: string, lastName: string, email: string) {
+    let content = `<div style="font-family: 'Arial', sans-serif; color: #333; padding: 20px;">
+      <h2 style="color: #4285f4;">¡Hola, ${firstName} ${lastName}!</h2>
+      <div>${message}</div>
+      <h4 style="margin: 5px auto;">Saludos y que tengas un excelente día</h4>
+      <p style="font-style: italic;">Enviado desde equipo técnico de Fast-Tour</p>
+      </div>`;
+    this.sendEmail(email, "Equipo de Fast-Tour", content);
   }
 }

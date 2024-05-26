@@ -20,4 +20,7 @@ export class Country {
 
   @OneToMany(() => Place, (place) => place.country)
   places: Place[];
+
+  @Column({ type: "boolean", default: true, select: false })
+  enabled: boolean;
 }

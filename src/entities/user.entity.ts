@@ -28,4 +28,7 @@ export class User {
 
   @OneToMany(() => Order, (order) => order.user, { onDelete: "CASCADE" })
   orders: Order[];
+
+  @Column({ type: "boolean", default: true, select: false })
+  enabled: boolean;
 }

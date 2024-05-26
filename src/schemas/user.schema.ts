@@ -10,6 +10,8 @@ const userId = Joi.number().positive().integer();
 const take = Joi.number().integer().min(0);
 const skip = Joi.number().integer().min(0);
 
+const message = Joi.string().min(1);
+
 export const createUserSchema = Joi.object({
   firstName: firstName.required(),
   lastName: lastName.required(),
@@ -31,4 +33,8 @@ export const getOrdersByUserSchema = Joi.object({
 export const queryUserSchema = Joi.object({
   take,
   skip,
+});
+
+export const sendMessageSchema = Joi.object({
+  message: message.required(),
 });

@@ -30,4 +30,7 @@ export class Place {
 
   @OneToMany(() => PlaceVisited, (placeVisited) => placeVisited.place)
   visiteds: PlaceVisited[];
+
+  @Column({ type: "boolean", default: true, select: false })
+  enabled: boolean;
 }
