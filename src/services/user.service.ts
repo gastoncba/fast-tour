@@ -76,7 +76,7 @@ export class UserService implements IService<UserDTO> {
     return user;
   }
 
-  async update(id: string, changes: { firstName?: string; lastName?: string; email?: string }) {
+  async update(id: string, changes: { firstName?: string; lastName?: string; email?: string, recoveryToken?: string }) {
     const user = await UserRepository.findOneBy({ id });
     if (!user) {
       throw boom.notFound(`user #${id} not found`);

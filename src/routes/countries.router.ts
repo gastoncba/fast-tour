@@ -38,17 +38,24 @@ router.post("/", passport.authenticate("jwt", { session: false }), validateUserR
   }
 });
 
-router.put("/:id", passport.authenticate("jwt", { session: false }), validateUserRole(["ADMIN"]), validatorHandler(getCountrySchema, "params"), validatorHandler(updateCountrySchema, "body"), async (req: Request, res: Response, next: NextFunction) => {
-  const body = req.body;
-  const { id } = req.params;
+router.put(
+  "/:id",
+  passport.authenticate("jwt", { session: false }),
+  validateUserRole(["ADMIN"]),
+  validatorHandler(getCountrySchema, "params"),
+  validatorHandler(updateCountrySchema, "body"),
+  async (req: Request, res: Response, next: NextFunction) => {
+    const body = req.body;
+    const { id } = req.params;
 
-  try {
-    const country = await countryService.update(id, body);
-    res.json(country);
-  } catch (error) {
-    next(error);
+    try {
+      const country = await countryService.update(id, body);
+      res.json(country);
+    } catch (error) {
+      next(error);
+    }
   }
-});
+);
 
 router.delete("/:id", passport.authenticate("jwt", { session: false }), validateUserRole(["ADMIN"]), async (req: Request, res: Response, next: NextFunction) => {
   const { id } = req.params;
