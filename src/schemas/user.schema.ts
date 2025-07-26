@@ -9,6 +9,8 @@ const userId = Joi.number().positive().integer();
 
 const take = Joi.number().integer().min(0);
 const skip = Joi.number().integer().min(0);
+const page = Joi.number().integer().positive().min(1);
+const limit = Joi.number().integer().positive().min(1).max(100);
 
 const message = Joi.string().min(1);
 
@@ -33,6 +35,12 @@ export const getOrdersByUserSchema = Joi.object({
 export const queryUserSchema = Joi.object({
   take,
   skip,
+  page,
+  limit,
+  firstName: Joi.string().max(50),
+  lastName: Joi.string().max(50),
+  email: Joi.string().email(),
+  roleId,
 });
 
 export const sendMessageSchema = Joi.object({

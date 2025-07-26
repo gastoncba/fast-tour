@@ -10,7 +10,20 @@ const countryService = new CountryService();
 
 router.get("/", validatorHandler(queryCountrySchema, "query"), async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const countries = await countryService.find(req.query);
+    const { page, limit, ...query } = req.query;
+    const pageNumber = page ? parseInt(page as string) : 1;
+    const limitNumber = limit ? parseInt(limit as string) : 10;
+    
+    const countries = await countryService.findPaginated(pageNumber, limitNumber, query);
+    res.json(countries);
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.get("/all", async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const countries = await countryService.find();
     res.json(countries);
   } catch (error) {
     next(error);

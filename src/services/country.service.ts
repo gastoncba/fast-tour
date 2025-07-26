@@ -3,9 +3,12 @@ import { FindManyOptions, ILike } from "typeorm";
 
 import { Country } from "../entities";
 import { CountryRepository } from "../repositories/repository";
+import { BaseService } from "./private/BaseService";
 
-export class CountryService {
-  constructor() {}
+export class CountryService extends BaseService<Country> {
+  constructor() {
+    super(CountryRepository);
+  }
 
   async find(query?: Record<string, any>, relations?: string[]) {
     const options: FindManyOptions<Country> = {};
@@ -72,5 +75,16 @@ export class CountryService {
       .limit(limit)
       .getRawMany();
     return countryTop;
+  }
+
+  protected applyQueryFilters(options: FindManyOptions<Country>, query: Record<string, any>): void {
+    const { name } = query;
+    
+    if (name) {
+      options.where = {
+        ...options.where,
+        name: ILike(`%${name}%`),
+      };
+    }
   }
 }

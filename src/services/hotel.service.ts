@@ -4,12 +4,14 @@ import { FindManyOptions, ILike, In } from "typeorm";
 import { HotelRepository } from "../repositories/repository";
 import { PlaceService } from "./place.service";
 import { Hotel } from "../entities";
-import { IService } from "./private/IService";
+import { BaseService } from "./private/BaseService";
 
 const placeService = new PlaceService();
 
-export class HotelService implements IService<Hotel> {
-  constructor() {}
+export class HotelService extends BaseService<Hotel> {
+  constructor() {
+    super(HotelRepository);
+  }
 
   async find(query?: Record<string, any>, relations?: string[]) {
     const options: FindManyOptions<Hotel> = {};
@@ -76,5 +78,23 @@ export class HotelService implements IService<Hotel> {
     const hotel = await this.findOne(id);
     hotel.enabled = false;
     await HotelRepository.save(hotel);
+  }
+
+  protected applyQueryFilters(options: FindManyOptions<Hotel>, query: Record<string, any>): void {
+    const { name, placeId } = query;
+    
+    if (name) {
+      options.where = {
+        ...options.where,
+        name: ILike(`%${name}%`),
+      };
+    }
+
+    if (placeId) {
+      options.where = {
+        ...options.where,
+        place: In([placeId]),
+      };
+    }
   }
 }

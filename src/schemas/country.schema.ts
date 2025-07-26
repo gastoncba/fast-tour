@@ -6,6 +6,8 @@ const code = Joi.string().min(1).max(10);
 
 const take = Joi.number().integer().min(0);
 const skip = Joi.number().integer().min(0);
+const page = Joi.number().integer().positive().min(1);
+const limit = Joi.number().integer().positive().min(1).max(100);
 
 export const createCountrySchema = Joi.object({
   name: name.required(),
@@ -24,5 +26,7 @@ export const getCountrySchema = Joi.object({
 export const queryCountrySchema = Joi.object({
   take,
   skip,
+  page,
+  limit,
   name: Joi.string().max(50)
 });

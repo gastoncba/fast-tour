@@ -5,9 +5,9 @@ import { UserRepository } from "../repositories/repository";
 import { RoleService } from "./role.service";
 import { OrderService } from "./order.service";
 import { UserDTO } from "../dtos/user.dto";
-import { FindManyOptions } from "typeorm";
+import { FindManyOptions, ILike } from "typeorm";
 import { User } from "../entities";
-import { IService } from "./private/IService";
+import { IService, PaginatedResponse } from "./private/IService";
 import { EmailService } from "./email.service";
 import { RoleType } from "../entities/role.entity";
 
@@ -17,6 +17,48 @@ const emailService = new EmailService();
 
 export class UserService implements IService<UserDTO> {
   constructor() {}
+
+  async findPaginated(
+    page: number = 1,
+    limit: number = 10,
+    query?: Record<string, any>,
+    relations?: string[]
+  ): Promise<PaginatedResponse<UserDTO>> {
+    const skip = (page - 1) * limit;
+    
+    const options: FindManyOptions<User> = {
+      skip,
+      take: limit,
+      relations: relations ? [...relations, "role"] : ["role"],
+      order: { id: "ASC" },
+      where: { enabled: true },
+    };
+
+    // Aplicar filtros adicionales si existen
+    if (query) {
+      this.applyQueryFilters(options, query);
+    }
+
+    // Obtener items y total
+    const [users, totalItems] = await UserRepository.findAndCount(options);
+    
+    // Convertir a DTOs y filtrar admins
+    const userDTOs = users.map((user) => new UserDTO(user)).filter((user) => user.role.name !== RoleType.ADMIN);
+    
+    const totalPages = Math.ceil(totalItems / limit);
+    const hasNext = page < totalPages;
+    const hasPrevious = page > 1;
+
+    return {
+      page,
+      items: userDTOs,
+      count: totalPages,
+      totalItems,
+      totalPages,
+      hasNext,
+      hasPrevious,
+    };
+  }
 
   async find(query?: Record<string, any>, relations?: []) {
     const options: FindManyOptions<User> = {};
@@ -113,5 +155,37 @@ export class UserService implements IService<UserDTO> {
   async sendMessage(userId: string, message: string) {
     const user = await this.findOne(userId);
     await emailService.sendToUser(message, user.firstName, user.lastName, user.email);
+  }
+
+  private applyQueryFilters(options: FindManyOptions<User>, query: Record<string, any>): void {
+    const { firstName, lastName, email, roleId } = query;
+    
+    if (firstName) {
+      options.where = {
+        ...options.where,
+        firstName: ILike(`%${firstName}%`),
+      };
+    }
+
+    if (lastName) {
+      options.where = {
+        ...options.where,
+        lastName: ILike(`%${lastName}%`),
+      };
+    }
+
+    if (email) {
+      options.where = {
+        ...options.where,
+        email: ILike(`%${email}%`),
+      };
+    }
+
+    if (roleId) {
+      options.where = {
+        ...options.where,
+        role: { id: roleId },
+      };
+    }
   }
 }

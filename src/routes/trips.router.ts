@@ -10,8 +10,11 @@ const tripService = new TripService();
 
 router.get("/", validatorHandler(queryTripSchema, "query"), async (req: Request, res: Response, next: NextFunction) => {
   try {
-    console.log(req.query);
-    const trips = await tripService.find(req.query);
+    const { page, limit, ...query } = req.query;
+    const pageNumber = page ? parseInt(page as string) : 1;
+    const limitNumber = limit ? parseInt(limit as string) : 10;
+    
+    const trips = await tripService.findPaginated(pageNumber, limitNumber, query);
     res.json(trips);
   } catch (error) {
     next(error);

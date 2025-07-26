@@ -10,7 +10,20 @@ const placeService = new PlaceService();
 
 router.get("/", validatorHandler(queryPlaceSchema, "query"), async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const places = await placeService.find(req.query);
+    const { page, limit, ...query } = req.query;
+    const pageNumber = page ? parseInt(page as string) : 1;
+    const limitNumber = limit ? parseInt(limit as string) : 10;
+    
+    const places = await placeService.findPaginated(pageNumber, limitNumber, query);
+    res.json(places);
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.get("/all", async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const places = await placeService.find();
     res.json(places);
   } catch (error) {
     next(error);

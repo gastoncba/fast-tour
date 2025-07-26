@@ -10,7 +10,20 @@ const hotelService = new HotelService();
 
 router.get("/", validatorHandler(queryHotelSchema, "query"), async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const hotels = await hotelService.find(req.query);
+    const { page, limit, ...query } = req.query;
+    const pageNumber = page ? parseInt(page as string) : 1;
+    const limitNumber = limit ? parseInt(limit as string) : 10;
+    
+    const hotels = await hotelService.findPaginated(pageNumber, limitNumber, query);
+    res.json(hotels);
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.get("/all", async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const hotels = await hotelService.find();
     res.json(hotels);
   } catch (error) {
     next(error);

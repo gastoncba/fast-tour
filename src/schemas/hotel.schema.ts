@@ -8,6 +8,8 @@ const placeId = Joi.number().integer().positive();
 
 const take = Joi.number().integer().min(0);
 const skip = Joi.number().integer().min(0);
+const page = Joi.number().integer().positive().min(1);
+const limit = Joi.number().integer().positive().min(1).max(100);
 
 export const createHotelSchema = Joi.object({
   name: name.required(),
@@ -32,4 +34,6 @@ export const queryHotelSchema = Joi.object({
   placeId,
   take,
   skip,
+  page,
+  limit,
 });

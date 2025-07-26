@@ -2,13 +2,16 @@ import { PlaceVisited } from "../entities";
 import { PlaceVisitedRepository } from "../repositories/repository";
 import { HotelService } from "./hotel.service";
 import { PlaceService } from "./place.service";
-import { IService } from "./private/IService";
+import { IService, PaginatedResponse } from "./private/IService";
 
 const placeService = new PlaceService();
 const hotelService = new HotelService();
 
 export class PlaceVisitedService implements IService<PlaceVisited> {
   constructor() {}
+  findPaginated(page?: number, limit?: number, query?: Record<string, any>, relations?: string[]): Promise<PaginatedResponse<PlaceVisited>> {
+    throw new Error("Method not implemented.");
+  }
   find(query?: Record<string, any> | undefined, relations?: string[] | undefined): Promise<PlaceVisited[]> {
     throw new Error("Method not implemented.");
   }

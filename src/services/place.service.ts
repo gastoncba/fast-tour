@@ -4,12 +4,14 @@ import { FindManyOptions, In, ILike } from "typeorm";
 import { PlaceRepository } from "../repositories/repository";
 import { CountryService } from "./country.service";
 import { Place } from "../entities";
-import { IService } from "./private/IService";
+import { BaseService } from "./private/BaseService";
 
 const countryService = new CountryService();
 
-export class PlaceService implements IService<Place> {
-  constructor() {}
+export class PlaceService extends BaseService<Place> {
+  constructor() {
+    super(PlaceRepository);
+  }
 
   async find(query?: Record<string, any>, relations?: string[]) {
     const options: FindManyOptions<Place> = {};
@@ -98,5 +100,20 @@ export class PlaceService implements IService<Place> {
       .limit(limit)
       .getRawMany();
     return placeTop;
+  }
+
+  protected applyQueryFilters(options: FindManyOptions<Place>, query: Record<string, any>): void {
+    const { countryId, name } = query;
+    
+    if (countryId) {
+      options.where = { ...options.where, country: { id: In([countryId]) } };
+    }
+
+    if (name) {
+      options.where = {
+        ...options.where,
+        name: ILike(`%${name}%`),
+      };
+    }
   }
 }

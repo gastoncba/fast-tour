@@ -7,7 +7,7 @@ import { appDataSource } from "../database/database";
 import { TripService } from "./trip.service";
 import { CountryService } from "./country.service";
 import { PlaceService } from "./place.service";
-import { IService } from "./private/IService";
+import { IService, PaginatedResponse } from "./private/IService";
 import { EmailService } from "./email.service";
 
 const tripService = new TripService();
@@ -39,6 +39,9 @@ export class TripRanking implements RankingStrategy {
 
 export class OrderService implements IService<Order> {
   constructor() {}
+  findPaginated(page?: number, limit?: number, query?: Record<string, any>, relations?: string[]): Promise<PaginatedResponse<Order>> {
+    throw new Error("Method not implemented.");
+  }
 
   async create(data: { purchaseDate: string; userId: number | null; tripId: number; placesVisited: { placeId: number; hotelId: number }[]; numberPeople: number; firstName?: string; lastName?: string; email?: string; total: number }) {
     const queryRunner = appDataSource.createQueryRunner();

@@ -4,12 +4,14 @@ import { Between, FindManyOptions, ILike, In, LessThanOrEqual, MoreThanOrEqual }
 import { Trip } from "../entities";
 import { TripRepository } from "../repositories/repository";
 import { PlaceService } from "./place.service";
-import { IService } from "./private/IService";
+import { BaseService } from "./private/BaseService";
 
 const placeService = new PlaceService();
 
-export class TripService implements IService<Trip> {
-  constructor() {}
+export class TripService extends BaseService<Trip> {
+  constructor() {
+    super(TripRepository);
+  }
 
   async find(query?: Record<string, any>, relations?: string[]) {
     const options: FindManyOptions<Trip> = {};
@@ -122,5 +124,50 @@ export class TripService implements IService<Trip> {
       .limit(limit)
       .getRawMany();
     return tripTop;
+  }
+
+  protected applyQueryFilters(options: FindManyOptions<Trip>, query: Record<string, any>): void {
+    const { maxPrice, minPrice, start, end, places, name } = query;
+    
+    if (minPrice && maxPrice) {
+      options.where = {
+        ...options.where,
+        price: Between(parseFloat(minPrice), parseFloat(maxPrice)),
+      };
+    }
+
+    if (start && end) {
+      const arrayStart = (start as string).split("-");
+      const arrayEnd = (end as string).split("-");
+      const formattedStart = new Date(parseInt(arrayStart[2]), parseInt(arrayStart[1]) - 1, parseInt(arrayStart[0]));
+      const formattedEnd = new Date(parseInt(arrayEnd[2]), parseInt(arrayEnd[1]) - 1, parseInt(arrayEnd[0]));
+      options.where = {
+        ...options.where,
+        startDate: MoreThanOrEqual(formattedStart),
+        endDate: LessThanOrEqual(formattedEnd),
+      };
+    }
+
+    if (places) {
+      const placesQuery = places as string;
+      const placesIds = placesQuery.split(",").map((q) => parseInt(q));
+
+      const currentRelations = options.relations as string[] || [];
+      options.relations = [...currentRelations, "places"];
+
+      options.where = {
+        ...options.where,
+        places: {
+          id: In(placesIds),
+        },
+      };
+    }
+
+    if (name) {
+      options.where = {
+        ...options.where,
+        name: ILike(`%${name}%`),
+      };
+    }
   }
 }

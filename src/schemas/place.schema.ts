@@ -8,6 +8,8 @@ const countryId = Joi.number().integer().positive();
 
 const take = Joi.number().integer().min(0);
 const skip = Joi.number().integer().min(0);
+const page = Joi.number().integer().positive().min(1);
+const limit = Joi.number().integer().positive().min(1).max(100);
 
 export const createPlaceSchema = Joi.object({
   name: name.required(),
@@ -32,4 +34,6 @@ export const queryPlaceSchema = Joi.object({
   countryId,
   take,
   skip,
+  page,
+  limit,
 })

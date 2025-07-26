@@ -2,10 +2,13 @@ import * as boom from "@hapi/boom";
 
 import { RoleRepository } from "../repositories/repository";
 import { Role, RoleType } from "../entities/role.entity";
-import { IService } from "./private/IService";
+import { IService, PaginatedResponse } from "./private/IService";
 
 export class RoleService implements IService<Role> {
   constructor() {}
+  findPaginated(page?: number, limit?: number, query?: Record<string, any>, relations?: string[]): Promise<PaginatedResponse<Role>> {
+    throw new Error("Method not implemented.");
+  }
 
   async create(data: { name: RoleType }) {
     const role = RoleRepository.create(data);

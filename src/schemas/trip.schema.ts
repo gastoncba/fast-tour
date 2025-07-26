@@ -14,6 +14,8 @@ const maxPrice = Joi.number().positive();
 const minPrice = Joi.number().positive().min(0);
 const take = Joi.number().integer().min(0);
 const skip = Joi.number().integer().min(0);
+const page = Joi.number().integer().positive().min(1);
+const limit = Joi.number().integer().positive().min(1).max(100);
 const start = Joi.extend(JoiDate).date().format("YYYY-MM-DD");
 const end = Joi.extend(JoiDate).date().format("YYYY-MM-DD");
 const places = Joi.string();
@@ -45,6 +47,8 @@ export const getTripSchema = Joi.object({
 export const queryTripSchema = Joi.object({
   take,
   skip,
+  page,
+  limit,
   minPrice,
   maxPrice: maxPrice.when("minPrice", {
     is: minPrice.required(),
